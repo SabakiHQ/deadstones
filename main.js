@@ -1,6 +1,5 @@
-const {equals} = require('./helper')
+const {equals, add} = require('./helper')
 const Board = require('./pseudoBoard')
-const add = (x, y) => x + y
 
 exports.getFloatingStones(data) {
     return new Board(data).getFloatingStones()
@@ -24,7 +23,7 @@ exports.guess = function(data, scoring = false, iterations = 50) {
             let vertex = [x, y]
             let sign = board.get(vertex)
 
-            if (sign === 0 || done[vertex] === true) continue
+            if (sign === 0 || vertex in done) continue
 
             let chain = board.getChain(vertex)
             let probability = chain.map(toProbability).reduce(add) / chain.length
@@ -44,7 +43,7 @@ exports.guess = function(data, scoring = false, iterations = 50) {
     let updatedResult = []
 
     for (let vertex of result) {
-        if (done[vertex] === true) continue
+        if (vertex in done) continue
 
         let related = board.getRelatedChains(vertex)
         let deadProbability = related.filter(v => result.some(equals(v))).length / related.length
@@ -54,7 +53,7 @@ exports.guess = function(data, scoring = false, iterations = 50) {
         }
 
         for (let v of related) {
-            done[v] === true
+            done[v] = true
         }
     }
 
@@ -112,7 +111,7 @@ exports.playTillEnd = function(data, sign, iterations = Infinity) {
 exports.getProbabilityMap = function(data, iterations) {
     let height = data.length
     let width = data.length === 0 ? 0 : data[0].length
-    let countMap = [...Array(height)].map(_ => [...Array(width)].map(__ => {p: 0, n: 0}))
+    let countMap = [...Array(height)].map(_ => [...Array(width)].map(__ => ({p: 0, n: 0})))
     let result = [...Array(height)].map(_ => Array(width).fill(0.5))
 
     for (let i = 0; i < iterations; i++) {

@@ -1,5 +1,4 @@
-const {equals, equalsSign} = require('./helper')
-const getNeighbors = ([x, y]) => [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]]
+const {equals, equalsSign, getNeighbors} = require('./helper')
 
 class PseudoBoard {
     constructor(data) {
@@ -174,7 +173,7 @@ class PseudoBoard {
         for (let i = 0; i < this.width; i++) {
             for (let j = 0; j < this.height; j++) {
                 let vertex = [i, j]
-                if (this.get(vertex) !== 0 || done[vertex] === true) continue
+                if (this.get(vertex) !== 0 || vertex in done) continue
 
                 let posArea = this.getConnectedComponent(vertex, [0, -1])
                 let negArea = this.getConnectedComponent(vertex, [0, 1])

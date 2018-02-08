@@ -1,7 +1,7 @@
 {
   "name": "@sabaki/deadstones",
   "version": "1.0.0",
-  "description": "Simple Monte Carlo function to determine dead stones on a Go board.",
+  "description": "Simple Monte Carlo functions to determine dead stones on a Go board.",
   "main": "main.js",
   "repository": {
     "type": "git",

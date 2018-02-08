@@ -1,3 +1,3 @@
 # deadstones
 
-Simple Monte Carlo function to determine dead stones on a Go board. This is a work in progress.
+Simple Monte Carlo functions to determine dead stones on a Go board. This is a work in progress.
