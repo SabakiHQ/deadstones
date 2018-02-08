@@ -5,10 +5,10 @@ exports.getFloatingStones = function(data) {
     return new Board(data).getFloatingStones()
 }
 
-exports.guess = function(data, scoring = false, iterations = 50) {
+exports.guess = function(data, {endOfGame = false, iterations = 50} = {}) {
     let board = new Board(data)
 
-    if (scoring) {
+    if (endOfGame) {
         let floating = board.getFloatingStones()
         floating.forEach(v => board.set(v, 0))
     }
@@ -35,7 +35,7 @@ exports.guess = function(data, scoring = false, iterations = 50) {
         }
     }
 
-    if (!scoring) return result
+    if (!endOfGame) return result
 
     // Preserve life & death status of related chains
 
@@ -60,7 +60,7 @@ exports.guess = function(data, scoring = false, iterations = 50) {
     return updatedResult
 }
 
-exports.playTillEnd = function(data, sign, iterations = Infinity) {
+exports.playTillEnd = function(data, sign, {maxMoves = Infinity} = {}) {
     let board = new Board(data)
     let freeVertices = []
     let illegalVertices = []
@@ -74,7 +74,7 @@ exports.playTillEnd = function(data, sign, iterations = Infinity) {
 
     let finished = [false, false]
 
-    while (iterations > 0 && freeVertices.length > 0 && finished.includes(false)) {
+    while (maxMoves > 0 && freeVertices.length > 0 && finished.includes(false)) {
         let madeMove = false
 
         while (freeVertices.length > 0) {
@@ -102,7 +102,7 @@ exports.playTillEnd = function(data, sign, iterations = Infinity) {
         illegalVertices.length = 0
 
         sign = -sign
-        iterations--
+        maxMoves--
     }
 
     return board
