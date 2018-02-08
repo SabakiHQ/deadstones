@@ -1,5 +1,4 @@
-const equals = v => w => w[0] === v[0] && w[1] === v[1]
-const equalsSign = (board, ...s) => v => s.includes(board.get(v))
+const {equals, equalsSign} = require('./helper')
 const getNeighbors = ([x, y]) => [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]]
 
 class PseudoBoard {
@@ -38,6 +37,11 @@ class PseudoBoard {
         }
 
         return result
+    }
+
+    getRelatedChains(vertex) {
+        let area = this.getConnectedComponent(vertex, [this.get(vertex), 0])
+        return area.filter(equalsSign(this, this.get(vertex)))
     }
 
     getChain(vertex) {
