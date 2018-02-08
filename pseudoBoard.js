@@ -2,7 +2,7 @@ const equals = v => w => w[0] === v[0] && w[1] === v[1]
 const equalsSign = (board, ...s) => v => s.includes(board.get(v))
 const getNeighbors = ([x, y]) => [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]]
 
-module.exports = class PseudoBoard {
+class PseudoBoard {
     constructor(data) {
         this.data = data
         this.height = data.length
@@ -14,32 +14,35 @@ module.exports = class PseudoBoard {
     }
 
     set([x, y], sign) {
-        if (this.data[y] != null) {
-            this.data[y][x] = sign
-        }
+        this.data[y][x] = sign
+    }
 
-        return this
+    clone() {
+        return new PseudoBoard(this.data.map(row => [...row]))
     }
 
     isPointChain(vertex) {
         return !getNeighbors(vertex).some(equalsSign(this, this.get(vertex)))
     }
 
-    getChain(vertex, result = null, sign = null) {
+    getConnectedComponent(vertex, signs, result = null) {
         if (result == null) result = [vertex]
-        if (sign == null) sign = this.get(vertex)
-
         let neighbors = getNeighbors(vertex)
 
         for (let i = 0; i < neighbors.length; i++) {
             let v = neighbors[i]
-            if (this.get(v) !== sign || result.some(equals(v))) continue
+            if (!signs.includes(this.get(v)) || result.some(equals(v))) continue
 
             result.push(v)
-            this.getChain(v, result, sign)
+            this.getConnectedComponent(v, signs, result)
         }
 
         return result
+    }
+
+    getChain(vertex) {
+        let sign = this.get(vertex)
+        return this.getConnectedComponent(vertex, [sign])
     }
 
     hasLiberties(vertex, visited = [], sign = null) {
@@ -156,4 +159,53 @@ module.exports = class PseudoBoard {
 
         return this
     }
+
+    getFloatingStones() {
+        let done = {}
+        let result = []
+        let isNegative = v => this.get(v) === -1
+        let isPositive = v => this.get(v) === 1
+        let markAsDone = v => done[v] = true
+
+        for (let i = 0; i < this.width; i++) {
+            for (let j = 0; j < this.height; j++) {
+                let vertex = [i, j]
+                if (this.get(vertex) !== 0 || done[vertex] === true) continue
+
+                let posArea = this.getConnectedComponent(vertex, [0, -1])
+                let negArea = this.getConnectedComponent(vertex, [0, 1])
+                let posDead = posArea.filter(isNegative)
+                let negDead = negArea.filter(isPositive)
+                let posDiff = posArea.filter(v => !posDead.some(equals(v)) && !negArea.some(equals(v)))
+                let negDiff = negArea.filter(v => !negDead.some(equals(v)) && !posArea.some(equals(v)))
+
+                let sign = 0
+                let actualArea, actualDead
+
+                if (negDiff.length <= 1 && negDead.length <= posDead.length) {
+                    sign--
+                    actualArea = negArea
+                    actualDead = negDead
+                }
+
+                if (posDiff.length <= 1 && posDead.length <= negDead.length) {
+                    sign++
+                    actualArea = posArea
+                    actualDead = posDead
+                }
+
+                if (sign === 0) {
+                    actualArea = this.getChain(vertex)
+                    actualDead = []
+                }
+
+                actualArea.forEach(markAsDone)
+                result.push(...actualDead)
+            }
+        }
+
+        return result
+    }
 }
+
+module.exports = PseudoBoard

@@ -4,7 +4,7 @@ exports.guess = function(board, scoring = false, iterations = 50) {
     let boardClone = board.clone()
 
     if (scoring) {
-        let floating = exports.getFloatingStones(boardClone)
+        let floating = boardClone.getFloatingStones()
         floating.forEach(v => boardClone.set(v, 0))
     }
 
@@ -50,54 +50,6 @@ exports.guess = function(board, scoring = false, iterations = 50) {
     }
 
     return updatedResult
-}
-
-exports.getFloatingStones = function(board) {
-    let map = board.getAreaMap()
-    let done = []
-    let result = []
-    let isNegative = v => board.get(v) === -1
-    let isPositive = v => board.get(v) === 1
-    let markAsDone = v => done.push(v)
-
-    for (let i = 0; i < board.width; i++) {
-        for (let j = 0; j < board.height; j++) {
-            let vertex = [i, j]
-            if (map[j][i] !== 0 || done.some(equals(vertex))) continue
-
-            let posArea = board.getConnectedComponent(vertex, [0, -1])
-            let negArea = board.getConnectedComponent(vertex, [0, 1])
-            let posDead = posArea.filter(isNegative)
-            let negDead = negArea.filter(isPositive)
-            let posDiff = posArea.filter(v => !posDead.some(equals(v)) && !negArea.some(equals(v)))
-            let negDiff = negArea.filter(v => !negDead.some(equals(v)) && !posArea.some(equals(v)))
-
-            let sign = 0
-            let actualArea, actualDead
-
-            if (negDiff.length <= 1 && negDead.length <= posDead.length) {
-                sign--
-                actualArea = negArea
-                actualDead = negDead
-            }
-
-            if (posDiff.length <= 1 && posDead.length <= negDead.length) {
-                sign++
-                actualArea = posArea
-                actualDead = posDead
-            }
-
-            if (sign === 0) {
-                actualArea = getChain(board, vertex)
-                actualDead = []
-            }
-
-            actualArea.forEach(markAsDone)
-            result.push(...actualDead)
-        }
-    }
-
-    return result
 }
 
 exports.playTillEnd = function(board, sign, iterations = Infinity) {
