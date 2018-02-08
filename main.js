@@ -1,7 +1,7 @@
 const {equals, add} = require('./helper')
 const Board = require('./pseudoBoard')
 
-exports.getFloatingStones(data) {
+exports.getFloatingStones = function(data) {
     return new Board(data).getFloatingStones()
 }
 
