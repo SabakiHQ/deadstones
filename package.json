@@ -1,0 +1,25 @@
+{
+  "name": "@sabaki/deadstones",
+  "version": "1.0.0",
+  "description": "Simple Monte Carlo function to determine dead stones on a Go board.",
+  "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SabakiHQ/deadstones.git"
+  },
+  "keywords": [
+    "go",
+    "weiqi",
+    "baduk",
+    "monte",
+    "carlo",
+    "life",
+    "death"
+  ],
+  "author": "Yichuan Shen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SabakiHQ/deadstones/issues"
+  },
+  "homepage": "https://github.com/SabakiHQ/deadstones"
+}
