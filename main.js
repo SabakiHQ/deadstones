@@ -23,7 +23,7 @@ exports.guess = function(data, {endOfGame = false, iterations = 50} = {}) {
 
             let chain = board.getChain(vertex)
             let probability = chain.map(toProbability).reduce(add) / chain.length
-            let newSign = probability < 0.5 ? -1 : probability > 0.5 ? 1 : 0
+            let newSign = probability < 0 ? -1 : probability > 0 ? 1 : 0
 
             if (newSign === -sign) result.push(...chain)
 
@@ -107,7 +107,7 @@ exports.getProbabilityMap = function(data, iterations) {
     let height = data.length
     let width = data.length === 0 ? 0 : data[0].length
     let countMap = [...Array(height)].map(_ => [...Array(width)].map(__ => ({p: 0, n: 0})))
-    let result = [...Array(height)].map(_ => Array(width).fill(0.5))
+    let result = [...Array(height)].map(_ => Array(width).fill(0))
 
     for (let i = 0; i < iterations; i++) {
         let sign = Math.sign(Math.random() - 0.5)
@@ -125,7 +125,7 @@ exports.getProbabilityMap = function(data, iterations) {
     for (let x = 0; x < width; x++) {
         for (let y = 0; y < height; y++) {
             let {n, p} = countMap[y][x]
-            if (p + n !== 0) result[y][x] = p / (p + n)
+            if (p + n !== 0) result[y][x] = (p / (p + n)) * 2 - 1
         }
     }
 
