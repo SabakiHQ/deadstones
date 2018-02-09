@@ -15,6 +15,10 @@ class PseudoBoard {
         this.data[y][x] = sign
     }
 
+    clone() {
+        return new PseudoBoard(this.data.map(row => [...row]))
+    }
+
     isPointChain(vertex) {
         return !getNeighbors(vertex).some(equalsSign(this, this.get(vertex)))
     }
