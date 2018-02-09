@@ -1,10 +1,6 @@
 const {equals, add} = require('./helper')
 const Board = require('./pseudoBoard')
 
-exports.getFloatingStones(data) {
-    return new Board(data).getFloatingStones()
-}
-
 exports.guess = function(data, {endOfGame = false, iterations = 50} = {}) {
     let board = new Board(data)
 
@@ -61,7 +57,7 @@ exports.guess = function(data, {endOfGame = false, iterations = 50} = {}) {
 }
 
 exports.playTillEnd = function(data, sign) {
-    let board = new Board(data)
+    let board = new Board(data).clone()
     let freeVertices = []
     let illegalVertices = []
 
@@ -104,7 +100,7 @@ exports.playTillEnd = function(data, sign) {
         sign = -sign
     }
 
-    return board
+    return board.fixHoles().data
 }
 
 exports.getProbabilityMap = function(data, iterations) {
@@ -115,7 +111,7 @@ exports.getProbabilityMap = function(data, iterations) {
 
     for (let i = 0; i < iterations; i++) {
         let sign = Math.sign(Math.random() - 0.5)
-        let areaMap = exports.playTillEnd(data, sign).fixHoles().data
+        let areaMap = exports.playTillEnd(data, sign)
 
         for (let x = 0; x < areaMap.width; x++) {
             for (let y = 0; y < areaMap.height; y++) {
@@ -134,4 +130,8 @@ exports.getProbabilityMap = function(data, iterations) {
     }
 
     return result
+}
+
+exports.getFloatingStones(data) {
+    return new Board(data).getFloatingStones()
 }
