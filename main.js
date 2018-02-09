@@ -60,7 +60,7 @@ exports.guess = function(data, {endOfGame = false, iterations = 50} = {}) {
     return updatedResult
 }
 
-exports.playTillEnd = function(data, sign, {maxMoves = Infinity} = {}) {
+exports.playTillEnd = function(data, sign) {
     let board = new Board(data)
     let freeVertices = []
     let illegalVertices = []
@@ -74,7 +74,7 @@ exports.playTillEnd = function(data, sign, {maxMoves = Infinity} = {}) {
 
     let finished = [false, false]
 
-    while (maxMoves > 0 && freeVertices.length > 0 && finished.includes(false)) {
+    while (freeVertices.length > 0 && finished.includes(false)) {
         let madeMove = false
 
         while (freeVertices.length > 0) {
@@ -102,7 +102,6 @@ exports.playTillEnd = function(data, sign, {maxMoves = Infinity} = {}) {
         illegalVertices.length = 0
 
         sign = -sign
-        maxMoves--
     }
 
     return board
