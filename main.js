@@ -132,6 +132,6 @@ exports.getProbabilityMap = function(data, iterations) {
     return result
 }
 
-exports.getFloatingStones(data) {
+exports.getFloatingStones = function(data) {
     return new Board(data).getFloatingStones()
 }
