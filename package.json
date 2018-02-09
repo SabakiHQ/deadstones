@@ -21,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/SabakiHQ/deadstones/issues"
   },
-  "homepage": "https://github.com/SabakiHQ/deadstones"
+  "homepage": "https://github.com/SabakiHQ/deadstones",
+  "devDependencies": {
+    "ava": "^0.25.0"
+  }
 }
