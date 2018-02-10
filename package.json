@@ -23,9 +23,9 @@
   },
   "homepage": "https://github.com/SabakiHQ/deadstones",
   "devDependencies": {
-    "tape": "^4.8.0"
+    "tap": "^11.1.0"
   },
   "scripts": {
-    "test": "tape tests/**/*.js"
+    "test": "tap tests/*.test.js"
   }
 }
