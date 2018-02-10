@@ -1,6 +1,6 @@
 const t = require('tap')
 const deadstones = require('..')
-const {equals} = require('../helper')
+const {equals} = require('../src/helper')
 const data = require('./data')
 
 t.test('should not mutate board data', t => {
