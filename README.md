@@ -18,7 +18,7 @@ This module exposes four functions:
 
 - `data` - Board data
 - `options` `<Object>` *(optional)*
-    - `endOfGame` `<Boolean>` *(optional)* - Default: `false`
+    - `finished` `<Boolean>` *(optional)* - Default: `false`
 
       If set `true`, deadstones will assume that player areas have been completely surrounded, yielding better results.
     - `iterations` `<Number>` *(optional)* - Default: `50`

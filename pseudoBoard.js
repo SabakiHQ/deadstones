@@ -88,10 +88,7 @@ class PseudoBoard {
         this.set(vertex, sign)
 
         if (!this.hasLiberties(vertex)) {
-            if (!neighbors.some(equalsSign(this, -sign))) {
-                this.set(vertex, 0)
-                return null
-            } else if (this.isPointChain(vertex)) {
+            if (this.isPointChain(vertex)) {
                 checkMultipleDeadChains = true
             } else {
                 checkCapture = true
@@ -130,37 +127,6 @@ class PseudoBoard {
         }
 
         return dead
-    }
-
-    fixHoles() {
-        for (let x = 0; x < this.width; x++) {
-            for (let y = 0; y < this.height; y++) {
-                let vertex = [x, y]
-                if (this.get(vertex) !== 0) continue
-
-                let neighbors = getNeighbors(vertex)
-                let sign = 0
-                let fix = true
-
-                for (let i = 1; i < neighbors.length; i++) {
-                    let n = neighbors[i]
-                    let s = this.get(n)
-
-                    if (s != null && s !== sign) {
-                        if (sign === 0) {
-                            sign = s
-                        } else {
-                            fix = false
-                            break
-                        }
-                    }
-                }
-
-                if (fix) this.set(vertex, sign)
-            }
-        }
-
-        return this
     }
 
     getFloatingStones() {

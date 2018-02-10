@@ -1,10 +1,10 @@
-const {equals, add} = require('./helper')
+const {equals, getNeighbors, add} = require('./helper')
 const Board = require('./pseudoBoard')
 
-exports.guess = function(data, {endOfGame = false, iterations = 50} = {}) {
+exports.guess = function(data, {finished = false, iterations = 50} = {}) {
     let board = new Board(data)
 
-    if (endOfGame) {
+    if (finished) {
         let floating = board.getFloatingStones()
         floating.forEach(v => board.set(v, 0))
     }
@@ -27,11 +27,13 @@ exports.guess = function(data, {endOfGame = false, iterations = 50} = {}) {
 
             if (newSign === -sign) result.push(...chain)
 
-            done[vertex] = true
+            for (let v of chain) {
+                done[v] = true
+            }
         }
     }
 
-    if (!endOfGame) return result
+    if (!finished) return result
 
     // Preserve life & death status of related chains
 
@@ -100,32 +102,52 @@ exports.playTillEnd = function(data, sign) {
         sign = -sign
     }
 
-    return board.fixHoles().data
+    for (let x = 0; x < board.width; x++) {
+        for (let y = 0; y < board.height; y++) {
+            let vertex = [x, y]
+            if (board.get(vertex) !== 0) continue
+
+            let neighbors = getNeighbors(vertex)
+            let sign = 0
+
+            for (let v of neighbors) {
+                let s = board.get(v)
+                
+                if (s === 1 || s === -1) {
+                    sign = s
+                    break;
+                }
+            }
+
+            if (sign !== 0) board.set(vertex, sign)
+        }
+    }
+
+    return board.data
 }
 
 exports.getProbabilityMap = function(data, iterations) {
     let height = data.length
     let width = data.length === 0 ? 0 : data[0].length
-    let countMap = [...Array(height)].map(_ => [...Array(width)].map(__ => ({p: 0, n: 0})))
-    let result = [...Array(height)].map(_ => Array(width).fill(0))
+    let result = [...Array(height)].map(_ => [...Array(width)].map(__ => ({p: 0, n: 0})))
 
     for (let i = 0; i < iterations; i++) {
         let sign = Math.sign(Math.random() - 0.5)
         let areaMap = exports.playTillEnd(data, sign)
 
-        for (let x = 0; x < areaMap.width; x++) {
-            for (let y = 0; y < areaMap.height; y++) {
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
                 let s = areaMap[y][x]
-                if (s === -1) countMap[y][x].n++
-                else if (s === 1) countMap[y][x].p++
+                if (s === -1) result[y][x].n++
+                else if (s === 1) result[y][x].p++
             }
         }
     }
 
     for (let x = 0; x < width; x++) {
         for (let y = 0; y < height; y++) {
-            let {n, p} = countMap[y][x]
-            if (p + n !== 0) result[y][x] = (p / (p + n)) * 2 - 1
+            let {n, p} = result[y][x]
+            result[y][x] = p + n !== 0 ? (p / (p + n)) * 2 - 1 : 0
         }
     }
 
