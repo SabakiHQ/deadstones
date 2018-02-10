@@ -39,8 +39,10 @@ class PseudoBoard {
     }
 
     getRelatedChains(vertex) {
-        let area = this.getConnectedComponent(vertex, [this.get(vertex), 0])
-        return area.filter(equalsSign(this, this.get(vertex)))
+        let sign = this.get(vertex)
+        let area = this.getConnectedComponent(vertex, [sign, 0])
+
+        return area.filter(equalsSign(this, sign))
     }
 
     getChain(vertex) {

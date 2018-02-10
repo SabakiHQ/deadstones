@@ -2,16 +2,17 @@ const {equals, getNeighbors, add} = require('./helper')
 const Board = require('./pseudoBoard')
 
 exports.guess = function(data, {finished = false, iterations = 50} = {}) {
-    let board = new Board(data)
+    let board = new Board(data).clone()
+    let result = []
+    let floating = []
 
     if (finished) {
-        let floating = board.getFloatingStones()
+        floating = board.getFloatingStones()
         floating.forEach(v => board.set(v, 0))
     }
 
     let map = exports.getProbabilityMap(board.data, iterations)
     let done = {}
-    let result = []
     let toProbability = ([x, y]) => map[y][x]
 
     for (let x = 0; x < board.width; x++) {
@@ -33,12 +34,15 @@ exports.guess = function(data, {finished = false, iterations = 50} = {}) {
         }
     }
 
-    if (!finished) return result
+    if (!finished) {
+        result.push(...floating)
+        return result
+    }
 
     // Preserve life & death status of related chains
 
     done = {}
-    let updatedResult = []
+    let updatedResult = floating
 
     for (let vertex of result) {
         if (vertex in done) continue

@@ -4,15 +4,15 @@ const data = require('./data')
 
 t.test('should not mutate board data', t => {
     let boardJSON = JSON.stringify(data.finished)
-    deadstones.playTillEnd(data.finished, -1)
+    deadstones.getProbabilityMap(data.finished, 50)
 
     t.assert(JSON.stringify(data.finished), boardJSON)
     t.end()
 })
 
-t.test('should not have empty vertices', t => {
-    let finished = deadstones.playTillEnd(data.unfinished, 1)
+t.test('should contain values between -1 and 1', t => {
+    let map = deadstones.getProbabilityMap(data.unfinished, 50)
 
-    t.assert(finished.every(row => row.every(x => x === 1 || x === -1)))
+    t.assert(map.every(row => row.every(x => -1 <= x && x <= 1)))
     t.end()
 })
