@@ -1,6 +1,6 @@
 # deadstones [![Build Status](https://travis-ci.org/SabakiHQ/deadstones.svg?branch=master)](https://travis-ci.org/SabakiHQ/deadstones)
 
-Simple Monte Carlo functions to determine dead stones on a Go board. This is a work in progress.
+Simple Monte Carlo functions to determine dead stones on a Go board.
 
 ## Installation
 
