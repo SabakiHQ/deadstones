@@ -11,10 +11,10 @@
     "go",
     "weiqi",
     "baduk",
-    "monte",
-    "carlo",
-    "life",
-    "death"
+    "strategy",
+    "analyzer",
+    "boardgame",
+    "montecarlo"
   ],
   "author": "Yichuan Shen",
   "license": "MIT",
