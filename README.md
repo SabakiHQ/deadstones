@@ -67,4 +67,4 @@ Makes random alternating moves, starting with the player determined by sign, unt
 
 - `data` - [Board data](#board-data)
 
-A fast function that returns an array of vertices of stones that do not surround more than one point of territory.
+A fast function that returns an array of vertices of stones that are inside enemy territory and do not surround more than one point of territory themselves.
