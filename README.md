@@ -10,6 +10,12 @@ Use npm to install:
 $ npm install @sabaki/deadstones
 ~~~
 
+Then require it as follows:
+
+~~~js
+const deadstones = require('@sabaki/deadstones');
+~~~
+
 ## API
 
 ### Board Data
