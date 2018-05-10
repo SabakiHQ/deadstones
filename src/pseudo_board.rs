@@ -34,7 +34,7 @@ impl PseudoBoard {
     pub fn is_point_chain(&self, vertex: Vertex) -> bool {
         let sign = self.get(vertex);
 
-        !get_neighbors(vertex)
+        !vertex.get_neighbors()
         .into_iter()
         .any(|v| self.get(v) == sign)
     }
@@ -46,7 +46,7 @@ impl PseudoBoard {
             signs: &[Sign],
             mut result: Vec<Vertex>
         ) -> Vec<Vertex> {
-            let neighbors = get_neighbors(vertex);
+            let neighbors = vertex.get_neighbors();
             let sign = board.get(vertex).unwrap();
 
             for neighbor in neighbors.into_iter() {
@@ -91,7 +91,7 @@ impl PseudoBoard {
             mut visited: Vec<Vertex>,
             sign: Sign
         ) -> (Vec<Vertex>, bool) {
-            let neighbors = get_neighbors(vertex);
+            let neighbors = vertex.get_neighbors();
             let mut friendly_neighbors = vec![];
 
             for neighbor in neighbors.into_iter() {
@@ -127,7 +127,7 @@ impl PseudoBoard {
     }
 
     pub fn make_pseudo_move(&mut self, sign: Sign, vertex: Vertex) -> Option<Vec<Vertex>> {
-        let neighbors = get_neighbors(vertex);
+        let neighbors = vertex.get_neighbors();
         let mut check_capture = false;
         let mut check_multiple_dead_chains = false;
 

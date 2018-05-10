@@ -160,7 +160,7 @@ pub fn play_till_end(data: BoardData, sign: i8) -> BoardData {
             continue;
         }
 
-        let neighbors = get_neighbors(vertex);
+        let neighbors = vertex.get_neighbors();
         let mut sign = 0;
 
         for v in neighbors.into_iter() {

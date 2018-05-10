@@ -7,7 +7,6 @@ extern crate serde_derive;
 extern crate serde_json;
 extern crate wasm_bindgen;
 
-use rand::Rng;
 use wasm_bindgen::prelude::*;
 
 mod vertex;
