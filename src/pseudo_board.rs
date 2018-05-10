@@ -76,7 +76,10 @@ impl PseudoBoard {
     }
 
     pub fn get_chain(&self, vertex: Vertex) -> Vec<Vertex> {
-        let sign = self.get(vertex).unwrap();
+        let sign = match self.get(vertex) {
+            Some(x) => x,
+            None => return vec![]
+        };
 
         self.get_connected_component(vertex, &vec![sign])
     }
@@ -120,7 +123,10 @@ impl PseudoBoard {
             (visited, false)
         }
 
-        inner(&self, vertex, vec![], self.get(vertex).unwrap()).1
+        inner(&self, vertex, vec![], match self.get(vertex) {
+            Some(x) => x,
+            None => return false
+        }).1
     }
 
     pub fn make_pseudo_move(&mut self, sign: Sign, vertex: Vertex) -> Option<Vec<Vertex>> {

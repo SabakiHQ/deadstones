@@ -1,8 +1,8 @@
-use rand::{self, Rng};
 use vertex::*;
 use pseudo_board::*;
 
-pub fn guess(data: BoardData, finished: bool, iterations: usize) -> Vec<Vertex> {
+pub fn guess<T>(data: BoardData, finished: bool, iterations: usize, random: T) -> Vec<Vertex>
+where T: Fn() -> f32 {
     let mut board = PseudoBoard::new(data);
     let mut result = vec![];
     let mut floating = vec![];
@@ -15,7 +15,7 @@ pub fn guess(data: BoardData, finished: bool, iterations: usize) -> Vec<Vertex> 
         }
     }
 
-    let map = get_probability_map(board.data.clone(), iterations);
+    let map = get_probability_map(board.data.clone(), iterations, || random());
     let mut done = vec![];
 
     for x in 0..board.width {
@@ -31,7 +31,7 @@ pub fn guess(data: BoardData, finished: bool, iterations: usize) -> Vec<Vertex> 
             let probability = chain.iter()
                 .map(|&Vertex(x, y)| map[y][x])
                 .sum::<f32>() / chain.len() as f32;
-            let new_sign = probability.signum() as i8;
+            let new_sign = probability.signum() as Sign;
 
             for &v in &chain {
                 if new_sign == -sign {
@@ -73,16 +73,16 @@ pub fn guess(data: BoardData, finished: bool, iterations: usize) -> Vec<Vertex> 
     updated_result
 }
 
-pub fn get_probability_map(data: BoardData, iterations: usize) -> Vec<Vec<f32>> {
+pub fn get_probability_map<T>(data: BoardData, iterations: usize, random: T) -> Vec<Vec<f32>>
+where T: Fn() -> f32 {
     let board = PseudoBoard::new(data);
-    let mut rng = rand::thread_rng();
     let mut result = (0..board.height).map(|_| {
         (0..board.width).map(|_| (0, 0)).collect::<Vec<_>>()
     }).collect::<Vec<_>>();
 
     for _ in 0..iterations {
-        let s = if rng.gen() { 1 } else { -1 };
-        let area_map = play_till_end(board.data.clone(), s);
+        let s = (random() - 0.5).signum() as Sign;
+        let area_map = play_till_end(board.data.clone(), s, || random());
 
         for x in 0..board.width {
             for y in 0..board.height {
@@ -109,8 +109,8 @@ pub fn get_probability_map(data: BoardData, iterations: usize) -> Vec<Vec<f32>> 
     .collect()
 }
 
-pub fn play_till_end(data: BoardData, sign: i8) -> BoardData {
-    let mut rng = rand::thread_rng();
+pub fn play_till_end<T>(data: BoardData, sign: Sign, random: T) -> BoardData
+where T: Fn() -> f32 {
     let mut sign = sign;
     let mut board = PseudoBoard::new(data);
     let mut illegal_vertices = vec![];
@@ -129,7 +129,7 @@ pub fn play_till_end(data: BoardData, sign: i8) -> BoardData {
         let mut made_move = false;
 
         while free_vertices.len() > 0 {
-            let random_index = rng.gen_range(0, free_vertices.len());
+            let random_index = (random() * free_vertices.len() as f32).floor() as usize;
             let vertex = free_vertices[random_index];
 
             free_vertices.remove(random_index);

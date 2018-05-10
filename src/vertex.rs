@@ -1,6 +1,6 @@
 pub type Sign = i8;
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Vertex(pub usize, pub usize);
 
 impl Vertex {
