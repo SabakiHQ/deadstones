@@ -191,46 +191,47 @@ impl PseudoBoard {
         let mut done = vec![];
         let mut result = vec![];
 
-        for i in 0..self.width {
-            for j in 0..self.height {
-                let vertex = Vertex(i, j);
-                if self.get(vertex).unwrap() != 0 || done.contains(&vertex) {
-                    continue;
-                }
+        let vertices = (0..self.width).flat_map(|x| {
+            (0..self.height).map(move |y| Vertex(x, y))
+        });
 
-                let pos_area = self.get_connected_component(vertex, &vec![0, -1]);
-                let neg_area = self.get_connected_component(vertex, &vec![0, 1]);
-                let pos_dead = pos_area.iter().cloned()
-                    .filter(|&v| self.get(v).unwrap() == -1).collect::<Vec<_>>();
-                let neg_dead = neg_area.iter().cloned()
-                    .filter(|&v| self.get(v).unwrap() == 1).collect::<Vec<_>>();
-                let pos_diff = pos_area.iter().cloned()
-                    .filter(|v| !pos_dead.contains(v) && !neg_area.contains(v)).count();
-                let neg_diff = neg_area.iter().cloned()
-                    .filter(|v| !neg_dead.contains(v) && !pos_area.contains(v)).count();
-
-                let mut sign = 0;
-
-                if neg_diff <= 1 && neg_dead.len() <= pos_dead.len() {
-                    sign -= 1;
-                }
-
-                if pos_diff <= 1 && pos_dead.len() <= neg_dead.len() {
-                    sign += 1;
-                }
-
-                let (actual_area, mut actual_dead) = match sign {
-                    1 => (pos_area, pos_dead),
-                    -1 => (neg_area, neg_dead),
-                    _ => (self.get_chain(vertex), vec![])
-                };
-
-                for &v in actual_area.iter() {
-                    done.push(v);
-                }
-
-                result.append(&mut actual_dead);
+        for vertex in vertices {
+            if self.get(vertex).unwrap() != 0 || done.contains(&vertex) {
+                continue;
             }
+
+            let pos_area = self.get_connected_component(vertex, &vec![0, -1]);
+            let neg_area = self.get_connected_component(vertex, &vec![0, 1]);
+            let pos_dead = pos_area.iter().cloned()
+                .filter(|&v| self.get(v).unwrap() == -1).collect::<Vec<_>>();
+            let neg_dead = neg_area.iter().cloned()
+                .filter(|&v| self.get(v).unwrap() == 1).collect::<Vec<_>>();
+            let pos_diff = pos_area.iter().cloned()
+                .filter(|v| !pos_dead.contains(v) && !neg_area.contains(v)).count();
+            let neg_diff = neg_area.iter().cloned()
+                .filter(|v| !neg_dead.contains(v) && !pos_area.contains(v)).count();
+
+            let mut sign = 0;
+
+            if neg_diff <= 1 && neg_dead.len() <= pos_dead.len() {
+                sign -= 1;
+            }
+
+            if pos_diff <= 1 && pos_dead.len() <= neg_dead.len() {
+                sign += 1;
+            }
+
+            let (actual_area, mut actual_dead) = match sign {
+                1 => (pos_area, pos_dead),
+                -1 => (neg_area, neg_dead),
+                _ => (self.get_chain(vertex), vec![])
+            };
+
+            for &v in actual_area.iter() {
+                done.push(v);
+            }
+
+            result.append(&mut actual_dead);
         }
 
         result
