@@ -21,7 +21,10 @@ where T: Fn() -> f32 {
     for x in 0..board.width {
         for y in 0..board.height {
             let vertex = Vertex(x, y);
-            let sign = board.get(vertex).unwrap();
+            let sign = match board.get(vertex) {
+                Some(x) => x,
+                None => continue
+            };
 
             if sign == 0 || done.contains(&vertex) {
                 continue;
@@ -77,11 +80,11 @@ pub fn get_probability_map<T>(data: BoardData, iterations: usize, random: T) -> 
 where T: Fn() -> f32 {
     let board = PseudoBoard::new(data);
     let mut result = (0..board.height).map(|_| {
-        (0..board.width).map(|_| (0, 0)).collect::<Vec<_>>()
+        (0..board.width).map(|_| (0u32, 0u32)).collect::<Vec<_>>()
     }).collect::<Vec<_>>();
 
     for _ in 0..iterations {
-        let s = (random() - 0.5).signum() as Sign;
+        let s = if random() - 0.5 < 0.0 { -1 } else { 1 };
         let area_map = play_till_end(board.data.clone(), s, || random());
 
         for x in 0..board.width {
@@ -111,7 +114,11 @@ where T: Fn() -> f32 {
 
 pub fn play_till_end<T>(data: BoardData, sign: Sign, random: T) -> BoardData
 where T: Fn() -> f32 {
-    let mut sign = sign;
+    let mut sign = match sign {
+        0 => return data,
+        x => x
+    };
+
     let mut board = PseudoBoard::new(data);
     let mut illegal_vertices = vec![];
     let width = board.width;
@@ -120,12 +127,13 @@ where T: Fn() -> f32 {
     let mut free_vertices = (0..width).flat_map(|x| {
         (0..height).map(move |y| Vertex(x, y))
     })
-    .filter(|&v| board.get(v).unwrap() == 0)
+    .filter(|&v| board.get(v) == Some(0))
     .collect::<Vec<_>>();
 
     let mut finished = vec![false, false];
+    let mut iterations = 0;
 
-    while free_vertices.len() > 0 && finished.contains(&false) {
+    while free_vertices.len() > 0 && finished.contains(&false) && iterations < 10000 {
         let mut made_move = false;
 
         while free_vertices.len() > 0 {
@@ -146,10 +154,11 @@ where T: Fn() -> f32 {
             }
         }
 
-        finished[if sign < 0 { 1 } else { 0 }] = !made_move;
+        finished[if sign > 0 { 0 } else { 1 }] = !made_move;
 
         free_vertices.append(&mut illegal_vertices);
         sign = -sign;
+        iterations += 1;
     }
 
     // Patch holes
@@ -159,7 +168,7 @@ where T: Fn() -> f32 {
     });
 
     for vertex in vertices {
-        if board.get(vertex).unwrap() != 0 {
+        if board.get(vertex) != Some(0) {
             continue;
         }
 

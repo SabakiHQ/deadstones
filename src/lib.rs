@@ -20,7 +20,10 @@ extern {
 fn parse_data(input: &str) -> BoardData {
     input.split(';').map(|row| {
         row.split(',')
-        .map(|sign| sign.parse::<Sign>().unwrap())
+        .map(|sign| match sign.parse::<Sign>() {
+            Ok(x) => x.signum() as Sign,
+            Err(_) => 0
+        })
         .collect()
     })
     .collect()
