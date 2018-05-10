@@ -21,9 +21,9 @@ pub fn guess(data: BoardData, finished: bool, iterations: usize) -> Vec<Vertex> 
     for x in 0..board.width {
         for y in 0..board.height {
             let vertex = Vertex(x, y);
-            let s = board.get(vertex).unwrap();
+            let sign = board.get(vertex).unwrap();
 
-            if s == 0 || done.contains(&vertex) {
+            if sign == 0 || done.contains(&vertex) {
                 continue;
             }
 
@@ -34,7 +34,10 @@ pub fn guess(data: BoardData, finished: bool, iterations: usize) -> Vec<Vertex> 
             let new_sign = probability.signum() as i8;
 
             for &v in &chain {
-                result.push(v);
+                if new_sign == -sign {
+                    result.push(v);
+                }
+
                 done.push(v);
             }
         }
@@ -77,7 +80,7 @@ pub fn get_probability_map(data: BoardData, iterations: usize) -> Vec<Vec<f32>> 
         (0..board.width).map(|_| (0, 0)).collect::<Vec<_>>()
     }).collect::<Vec<_>>();
 
-    for i in 0..iterations {
+    for _ in 0..iterations {
         let s = if rng.gen() { 1 } else { -1 };
         let area_map = play_till_end(board.data.clone(), s);
 

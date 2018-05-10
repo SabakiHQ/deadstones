@@ -46,10 +46,7 @@ impl PseudoBoard {
             signs: &[Sign],
             mut result: Vec<Vertex>
         ) -> Vec<Vertex> {
-            let neighbors = vertex.get_neighbors();
-            let sign = board.get(vertex).unwrap();
-
-            for neighbor in neighbors.into_iter() {
+            for neighbor in vertex.get_neighbors().into_iter() {
                 let s = match board.get(neighbor) {
                     Some(x) => x,
                     None => continue
