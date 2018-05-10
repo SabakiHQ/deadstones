@@ -7,4 +7,5 @@ authors = ["Yichuan Shen <shen.yichuan@gmail.com>"]
 crate-type = ["cdylib"]
 
 [dependencies]
+rand = "0.4"
 wasm-bindgen = "0.2.8"

@@ -1,14 +1,6 @@
-use wasm_bindgen::prelude::*;
+use rand::{self, Rng};
 use vertex::*;
 use pseudo_board::*;
-
-#[wasm_bindgen]
-extern {
-    #[wasm_bindgen(js_namespace = Math)]
-    fn random() -> f32;
-    #[wasm_bindgen(js_namespace = Math)]
-    fn sign(x: f32) -> i8;
-}
 
 pub fn guess(data: BoardData, finished: bool, iterations: usize) -> Vec<Vertex> {
     let mut board = PseudoBoard::new(data);
@@ -39,7 +31,7 @@ pub fn guess(data: BoardData, finished: bool, iterations: usize) -> Vec<Vertex> 
             let probability = chain.iter()
                 .map(|&Vertex(x, y)| map[y][x])
                 .sum::<f32>() / chain.len() as f32;
-            let new_sign = sign(probability);
+            let new_sign = probability.signum() as i8;
 
             for &v in &chain {
                 result.push(v);
@@ -80,13 +72,14 @@ pub fn guess(data: BoardData, finished: bool, iterations: usize) -> Vec<Vertex> 
 
 pub fn get_probability_map(data: BoardData, iterations: usize) -> Vec<Vec<f32>> {
     let board = PseudoBoard::new(data);
+    let mut rng = rand::thread_rng();
     let mut result = (0..board.height).map(|_| {
         (0..board.width).map(|_| (0, 0)).collect::<Vec<_>>()
     }).collect::<Vec<_>>();
 
     for i in 0..iterations {
-        let sign = sign(random() - 0.5);
-        let area_map = play_till_end(board.data.clone(), sign);
+        let s = if rng.gen() { 1 } else { -1 };
+        let area_map = play_till_end(board.data.clone(), s);
 
         for x in 0..board.width {
             for y in 0..board.height {
@@ -114,6 +107,7 @@ pub fn get_probability_map(data: BoardData, iterations: usize) -> Vec<Vec<f32>> 
 }
 
 pub fn play_till_end(data: BoardData, sign: i8) -> BoardData {
+    let mut rng = rand::thread_rng();
     let mut sign = sign;
     let mut board = PseudoBoard::new(data);
     let mut illegal_vertices = vec![];
@@ -132,7 +126,7 @@ pub fn play_till_end(data: BoardData, sign: i8) -> BoardData {
         let mut made_move = false;
 
         while free_vertices.len() > 0 {
-            let random_index = (random() * free_vertices.len() as f32).floor() as usize;
+            let random_index = rng.gen_range(0, free_vertices.len());
             let vertex = free_vertices[random_index];
 
             free_vertices.remove(random_index);
