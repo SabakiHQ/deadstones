@@ -1,0 +1,37 @@
+{
+  "name": "@sabaki/deadstones",
+  "version": "2.0.0",
+  "description": "Simple Monte Carlo functions to determine dead stones on a Go board.",
+  "main": "./pkg/deadstones.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SabakiHQ/deadstones.git"
+  },
+  "keywords": [
+    "go",
+    "weiqi",
+    "baduk",
+    "strategy",
+    "analyzer",
+    "boardgame",
+    "montecarlo"
+  ],
+  "author": "Yichuan Shen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SabakiHQ/deadstones/issues"
+  },
+  "homepage": "https://github.com/SabakiHQ/deadstones",
+  "scripts": {
+    "compile": "cargo build --target wasm32-unknown-unknown --release",
+    "pack": "mkdirp ./pkg && wasm-bindgen ./target/wasm32-unknown-unknown/debug/deadstones.wasm --out-dir ./pkg --nodejs --no-typescript",
+    "build": "npm run compile && npm run pack",
+    "prepublish": "npm run build"
+  },
+  "files": [
+    "pkg"
+  ],
+  "devDependencies": {
+    "mkdirp": "^0.5.1"
+  }
+}
