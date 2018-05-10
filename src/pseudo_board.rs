@@ -40,12 +40,22 @@ impl PseudoBoard {
     }
 
     pub fn get_connected_component(&self, vertex: Vertex, signs: &[Sign]) -> Vec<Vertex> {
-        fn inner(board: &PseudoBoard, vertex: Vertex, signs: &[Sign], mut result: Vec<Vertex>) -> Vec<Vertex> {
+        fn inner(
+            board: &PseudoBoard,
+            vertex: Vertex,
+            signs: &[Sign],
+            mut result: Vec<Vertex>
+        ) -> Vec<Vertex> {
             let neighbors = get_neighbors(vertex);
             let sign = board.get(vertex).unwrap();
 
             for neighbor in neighbors.into_iter() {
-                if !signs.contains(&sign) || result.contains(&neighbor) {
+                let s = match board.get(neighbor) {
+                    Some(x) => x,
+                    None => continue
+                };
+
+                if !signs.contains(&s) || result.contains(&neighbor) {
                     continue;
                 }
 
@@ -75,7 +85,12 @@ impl PseudoBoard {
     }
 
     pub fn has_liberties(&self, vertex: Vertex) -> bool {
-        fn inner(board: &PseudoBoard, vertex: Vertex, mut visited: Vec<Vertex>, sign: Sign) -> (Vec<Vertex>, bool) {
+        fn inner(
+            board: &PseudoBoard,
+            vertex: Vertex,
+            mut visited: Vec<Vertex>,
+            sign: Sign
+        ) -> (Vec<Vertex>, bool) {
             let neighbors = get_neighbors(vertex);
             let mut friendly_neighbors = vec![];
 
@@ -185,10 +200,14 @@ impl PseudoBoard {
 
                 let pos_area = self.get_connected_component(vertex, &vec![0, -1]);
                 let neg_area = self.get_connected_component(vertex, &vec![0, 1]);
-                let pos_dead = pos_area.iter().cloned().filter(|&v| self.get(v).unwrap() == -1).collect::<Vec<_>>();
-                let neg_dead = neg_area.iter().cloned().filter(|&v| self.get(v).unwrap() == 1).collect::<Vec<_>>();
-                let pos_diff = pos_area.iter().cloned().filter(|v| !pos_dead.contains(v) && !neg_area.contains(v)).count();
-                let neg_diff = neg_area.iter().cloned().filter(|v| !neg_dead.contains(v) && !pos_area.contains(v)).count();
+                let pos_dead = pos_area.iter().cloned()
+                    .filter(|&v| self.get(v).unwrap() == -1).collect::<Vec<_>>();
+                let neg_dead = neg_area.iter().cloned()
+                    .filter(|&v| self.get(v).unwrap() == 1).collect::<Vec<_>>();
+                let pos_diff = pos_area.iter().cloned()
+                    .filter(|v| !pos_dead.contains(v) && !neg_area.contains(v)).count();
+                let neg_diff = neg_area.iter().cloned()
+                    .filter(|v| !neg_dead.contains(v) && !pos_area.contains(v)).count();
 
                 let mut sign = 0;
 

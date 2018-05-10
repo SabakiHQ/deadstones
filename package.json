@@ -24,7 +24,7 @@
   "homepage": "https://github.com/SabakiHQ/deadstones",
   "scripts": {
     "compile": "cargo build --target wasm32-unknown-unknown --release",
-    "pack": "mkdirp ./pkg && wasm-bindgen ./target/wasm32-unknown-unknown/debug/deadstones.wasm --out-dir ./pkg --nodejs --no-typescript",
+    "pack": "mkdirp ./pkg && wasm-bindgen ./target/wasm32-unknown-unknown/release/deadstones.wasm --out-dir ./pkg --nodejs --no-typescript",
     "build": "npm run compile && npm run pack",
     "prepublish": "npm run build"
   },

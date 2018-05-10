@@ -1,6 +1,6 @@
 pub type Sign = i8;
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Vertex(pub usize, pub usize);
 
 pub fn get_neighbors(Vertex(x, y): Vertex) -> Vec<Vertex> {
