@@ -2,7 +2,7 @@
   "name": "@sabaki/deadstones",
   "version": "2.0.0",
   "description": "Simple Monte Carlo functions to determine dead stones on a Go board.",
-  "main": "./dist/deadstones.js",
+  "main": "./src/main.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SabakiHQ/deadstones.git"
@@ -29,7 +29,7 @@
     "prepublishOnly": "npm run build"
   },
   "files": [
-    "dist"
+    "wasm"
   ],
   "devDependencies": {
     "mkdirp": "^0.5.1"
