@@ -161,37 +161,6 @@ where T: Fn() -> f64 {
         iterations += 1;
     }
 
-    // Patch holes
-
-    let vertices = (0..width).flat_map(|x| {
-        (0..height).map(move |y| Vertex(x, y))
-    });
-
-    for vertex in vertices {
-        if board.get(vertex) != Some(0) {
-            continue;
-        }
-
-        let neighbors = vertex.get_neighbors();
-        let mut sign = 0;
-
-        for v in neighbors.into_iter() {
-            let s = match board.get(v) {
-                Some(x) => x,
-                None => continue
-            };
-
-            if s == 1 || s == -1 {
-                sign = s;
-                break;
-            }
-        }
-
-        if sign != 0 {
-            board.set(vertex, sign);
-        }
-    }
-
     board.data
 }
 
