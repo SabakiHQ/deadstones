@@ -145,7 +145,7 @@ where T: Fn() -> f64 {
     let mut finished = vec![false, false];
     let mut iterations = 0;
 
-    while free_vertices.len() > 0 && finished.contains(&false) && iterations < 1000 {
+    while free_vertices.len() > 0 && finished.contains(&false) && iterations < 500 {
         let mut made_move = false;
 
         while free_vertices.len() > 0 {

@@ -16,33 +16,33 @@ extern {
 }
 
 #[wasm_bindgen]
-pub fn guess(data: &str, finished: bool, iterations: usize) -> String {
-    let data = data::parse_boarddata(data);
+pub fn guess(data: Vec<i8>, width: usize, finished: bool, iterations: usize) -> Vec<u32> {
+    let data = data::parse_boarddata(&data, width);
     let result = deadstones::guess(data, finished, iterations, || random());
 
-    data::stringify_vertex_list(&result)
+    data::flatten_vertices(result)
 }
 
 #[wasm_bindgen]
-pub fn get_probability_map(data: &str, iterations: usize) -> String {
-    let data = data::parse_boarddata(data);
+pub fn get_probability_map(data: Vec<i8>, width: usize, iterations: usize) -> Vec<i32> {
+    let data = data::parse_boarddata(&data, width);
     let result = deadstones::get_probability_map(data, iterations, || random());
 
-    data::stringify_grid(&result)
+    data::flatten_board_data(result)
 }
 
 #[wasm_bindgen]
-pub fn play_till_end(data: &str, sign: i8) -> String {
-    let data = data::parse_boarddata(data);
+pub fn play_till_end(data: Vec<i8>, width: usize, sign: i8) -> Vec<i8> {
+    let data = data::parse_boarddata(&data, width);
     let result = deadstones::play_till_end(data, sign, || random());
 
-    data::stringify_grid(&result)
+    data::flatten_board_data(result)
 }
 
 #[wasm_bindgen]
-pub fn get_floating_stones(data: &str) -> String {
-    let data = data::parse_boarddata(data);
+pub fn get_floating_stones(data: Vec<i8>, width: usize) -> Vec<u32> {
+    let data = data::parse_boarddata(&data, width);
     let result = deadstones::get_floating_stones(data);
 
-    data::stringify_vertex_list(&result)
+    data::flatten_vertices(result)
 }

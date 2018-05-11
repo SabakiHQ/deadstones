@@ -1,39 +1,33 @@
 use vertex::*;
 use pseudo_board::*;
 
-pub fn parse_boarddata(input: &str) -> BoardData {
-    input.split(';').map(|row| {
-        row.split(',')
-        .map(|sign| match sign.parse::<Sign>() {
-            Ok(x) => x.signum() as Sign,
-            Err(_) => 0
-        })
+pub fn parse_boarddata(data: &Vec<Sign>, width: usize) -> BoardData {
+    let height = match data.len().checked_div(width) {
+        Some(x) => x,
+        None => return vec![]
+    };
+
+    (0..height).map(|y| {
+        (&data[y * width..(y + 1) * width])
+        .iter()
+        .cloned()
         .collect()
-    })
-    .collect()
+    }).collect()
 }
 
-pub fn stringify_vertex_list(vertices: &Vec<Vertex>) -> String {
-    vertices.iter()
-    .map(|v| v.0.to_string() + "," + &v.1.to_string())
-    .fold(String::new(), |acc, x| match acc.len() {
-        0 => x,
-        _ => acc + ";" + &x
+pub fn flatten_vertices(data: Vec<Vertex>) -> Vec<u32> {
+    data.into_iter()
+    .fold(Vec::new(), |mut acc, vertex| {
+        acc.push(vertex.0 as u32);
+        acc.push(vertex.1 as u32);
+        acc
     })
 }
 
-pub fn stringify_grid<T: ToString>(data: &Vec<Vec<T>>) -> String {
-    data.iter()
-    .map(|row| {
-        row.into_iter()
-        .map(|x| x.to_string())
-        .fold(String::new(), |acc, x| match acc.len() {
-            0 => x,
-            _ => acc + "," + &x
-        })
-    })
-    .fold(String::new(), |acc, x| match acc.len() {
-        0 => x,
-        _ => acc + ";" + &x
+pub fn flatten_board_data<T>(data: Vec<Vec<T>>) -> Vec<T> {
+    data.into_iter()
+    .fold(Vec::new(), |mut acc, mut row| {
+        acc.append(&mut row);
+        acc
     })
 }
