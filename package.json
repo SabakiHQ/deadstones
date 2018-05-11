@@ -26,7 +26,7 @@
     "compile": "cargo build --target wasm32-unknown-unknown --release",
     "pack": "mkdirp ./dist && wasm-bindgen ./target/wasm32-unknown-unknown/release/deadstones.wasm --out-dir ./dist --no-typescript --nodejs",
     "build": "npm run compile && npm run pack",
-    "prepublish": "npm run build"
+    "prepublishOnly": "npm run build"
   },
   "files": [
     "dist"

@@ -4,9 +4,9 @@ extern crate wasm_bindgen;
 
 use wasm_bindgen::prelude::*;
 
+mod deadstones;
 mod vertex;
 mod pseudo_board;
-mod deadstones;
 
 use vertex::*;
 use pseudo_board::*;
@@ -14,7 +14,7 @@ use pseudo_board::*;
 #[wasm_bindgen]
 extern {
     #[wasm_bindgen(js_namespace = Math)]
-    fn random() -> f32;
+    fn random() -> f64;
 }
 
 fn parse_data(input: &str) -> BoardData {
@@ -32,7 +32,7 @@ fn parse_data(input: &str) -> BoardData {
 fn stringify_vertex_list(vertices: &Vec<Vertex>) -> String {
     vertices.iter()
     .map(|v| v.0.to_string() + "," + &v.1.to_string())
-    .fold(String::new(), |acc, x| match acc.len() { 
+    .fold(String::new(), |acc, x| match acc.len() {
         0 => x,
         _ => acc + ";" + &x
     })
@@ -43,12 +43,12 @@ fn stringify_grid<T: ToString>(data: &Vec<Vec<T>>) -> String {
     .map(|row| {
         row.iter()
         .map(|x| x.to_string())
-        .fold(String::new(), |acc, x| match acc.len() { 
+        .fold(String::new(), |acc, x| match acc.len() {
             0 => x,
             _ => acc + "," + &x
         })
     })
-    .fold(String::new(), |acc, x| match acc.len() { 
+    .fold(String::new(), |acc, x| match acc.len() {
         0 => x,
         _ => acc + ";" + &x
     })

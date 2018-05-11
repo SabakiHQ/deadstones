@@ -2,7 +2,7 @@ use vertex::*;
 use pseudo_board::*;
 
 pub fn guess<T>(data: BoardData, finished: bool, iterations: usize, random: T) -> Vec<Vertex>
-where T: Fn() -> f32 {
+where T: Fn() -> f64 {
     let mut board = PseudoBoard::new(data);
     let mut result = vec![];
     let mut floating = vec![];
@@ -33,7 +33,7 @@ where T: Fn() -> f32 {
             let chain = board.get_chain(vertex);
             let probability = chain.iter()
                 .map(|&Vertex(x, y)| map[y][x])
-                .sum::<f32>() / chain.len() as f32;
+                .sum::<f64>() / chain.len() as f64;
             let new_sign = probability.signum() as Sign;
 
             for &v in &chain {
@@ -62,7 +62,7 @@ where T: Fn() -> f32 {
         }
 
         let related = board.get_related_chains(vertex);
-        let dead_probability = related.iter().filter(|&v| result.contains(v)).count() as f32 / related.len() as f32;
+        let dead_probability = related.iter().filter(|&v| result.contains(v)).count() as f64 / related.len() as f64;
 
         for &v in &related {
             if dead_probability > 0.5 {
@@ -76,8 +76,8 @@ where T: Fn() -> f32 {
     updated_result
 }
 
-pub fn get_probability_map<T>(data: BoardData, iterations: usize, random: T) -> Vec<Vec<f32>>
-where T: Fn() -> f32 {
+pub fn get_probability_map<T>(data: BoardData, iterations: usize, random: T) -> Vec<Vec<f64>>
+where T: Fn() -> f64 {
     let board = PseudoBoard::new(data);
     let mut result = (0..board.height).map(|_| {
         (0..board.width).map(|_| (0u32, 0u32)).collect::<Vec<_>>()
@@ -104,8 +104,8 @@ where T: Fn() -> f32 {
     .map(|row| {
         row.into_iter()
         .map(|(n, p)| match p + n {
-            0 => 0f32,
-            _ => p as f32 / (p + n) as f32
+            0 => 0f64,
+            _ => p as f64 / (p + n) as f64
         })
         .collect()
     })
@@ -113,7 +113,7 @@ where T: Fn() -> f32 {
 }
 
 pub fn play_till_end<T>(data: BoardData, sign: Sign, random: T) -> BoardData
-where T: Fn() -> f32 {
+where T: Fn() -> f64 {
     let mut sign = match sign {
         0 => return data,
         x => x
@@ -123,7 +123,7 @@ where T: Fn() -> f32 {
     let mut illegal_vertices = vec![];
     let width = board.width;
     let height = board.height;
-    
+
     let mut free_vertices = (0..width).flat_map(|x| {
         (0..height).map(move |y| Vertex(x, y))
     })
@@ -137,7 +137,7 @@ where T: Fn() -> f32 {
         let mut made_move = false;
 
         while free_vertices.len() > 0 {
-            let random_index = (random() * free_vertices.len() as f32).floor() as usize;
+            let random_index = (random() * free_vertices.len() as f64).floor() as usize;
             let vertex = free_vertices[random_index];
 
             free_vertices.remove(random_index);
@@ -163,34 +163,34 @@ where T: Fn() -> f32 {
 
     // Patch holes
 
-    let vertices = (0..width).flat_map(|x| {
-        (0..height).map(move |y| Vertex(x, y))
-    });
-
-    for vertex in vertices {
-        if board.get(vertex) != Some(0) {
-            continue;
-        }
-
-        let neighbors = vertex.get_neighbors();
-        let mut sign = 0;
-
-        for v in neighbors.into_iter() {
-            let s = match board.get(v) {
-                Some(x) => x,
-                None => continue
-            };
-
-            if s == 1 || s == -1 {
-                sign = s;
-                break;
-            }
-        }
-
-        if sign != 0 {
-            board.set(vertex, sign);
-        }
-    }
+    // let vertices = (0..width).flat_map(|x| {
+    //     (0..height).map(move |y| Vertex(x, y))
+    // });
+    //
+    // for vertex in vertices {
+    //     if board.get(vertex) != Some(0) {
+    //         continue;
+    //     }
+    //
+    //     let neighbors = vertex.get_neighbors();
+    //     let mut sign = 0;
+    //
+    //     for v in neighbors.into_iter() {
+    //         let s = match board.get(v) {
+    //             Some(x) => x,
+    //             None => continue
+    //         };
+    //
+    //         if s == 1 || s == -1 {
+    //             sign = s;
+    //             break;
+    //         }
+    //     }
+    //
+    //     if sign != 0 {
+    //         board.set(vertex, sign);
+    //     }
+    // }
 
     board.data
 }
