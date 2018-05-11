@@ -28,34 +28,33 @@ impl PseudoBoard {
     }
 
     pub fn set(&mut self, Vertex(x, y): Vertex, sign: Sign) {
-        self.data[y][x] = sign;
+        if let Some(row) = self.data.get_mut(y) {
+            if let Some(col) = row.get_mut(x) {
+                *col = sign;
+            }
+        }
+    }
+
+    fn get_connected_component_inner(&self, vertex: Vertex, signs: &[Sign], mut result: Vec<Vertex>) -> Vec<Vertex> {
+        for neighbor in vertex.get_neighbors().into_iter() {
+            let s = match self.get(neighbor) {
+                Some(x) => x,
+                None => continue
+            };
+
+            if !signs.contains(&s) || result.contains(&neighbor) {
+                continue;
+            }
+
+            result.push(neighbor);
+            result = self.get_connected_component_inner(neighbor, signs, result);
+        }
+
+        result
     }
 
     pub fn get_connected_component(&self, vertex: Vertex, signs: &[Sign]) -> Vec<Vertex> {
-        fn inner(
-            board: &PseudoBoard,
-            vertex: Vertex,
-            signs: &[Sign],
-            mut result: Vec<Vertex>
-        ) -> Vec<Vertex> {
-            for neighbor in vertex.get_neighbors().into_iter() {
-                let s = match board.get(neighbor) {
-                    Some(x) => x,
-                    None => continue
-                };
-
-                if !signs.contains(&s) || result.contains(&neighbor) {
-                    continue;
-                }
-
-                result.push(neighbor);
-                result = inner(board, neighbor, signs, result);
-            }
-
-            result
-        }
-
-        inner(&self, vertex, signs, vec![vertex])
+        self.get_connected_component_inner(vertex, signs, vec![vertex])
     }
 
     pub fn get_related_chains(&self, vertex: Vertex) -> Vec<Vertex> {
@@ -79,41 +78,36 @@ impl PseudoBoard {
         self.get_connected_component(vertex, &vec![sign])
     }
 
-    pub fn has_liberties(&self, vertex: Vertex) -> bool {
-        fn inner(
-            board: &PseudoBoard,
-            vertex: Vertex,
-            mut visited: Vec<Vertex>,
-            sign: Sign
-        ) -> (Vec<Vertex>, bool) {
-            let neighbors = vertex.get_neighbors();
-            let mut friendly_neighbors = vec![];
+    fn has_liberties_inner(&self, vertex: Vertex, mut visited: Vec<Vertex>, sign: Sign) -> (Vec<Vertex>, bool) {
+        let neighbors = vertex.get_neighbors();
+        let mut friendly_neighbors = vec![];
 
-            for neighbor in neighbors.into_iter() {
-                match board.get(neighbor) {
-                    Some(0) => return (visited, true),
-                    Some(s) if s == sign => friendly_neighbors.push(neighbor),
-                    _ => ()
-                };
-            }
-
-            visited.push(vertex);
-
-            for neighbor in friendly_neighbors.into_iter() {
-                if visited.contains(&neighbor) {
-                    continue;
-                }
-
-                visited = match inner(board, neighbor, visited, sign) {
-                    (x, true) => return (x, true),
-                    (x, false) => x
-                };
-            }
-
-            (visited, false)
+        for neighbor in neighbors.into_iter() {
+            match self.get(neighbor) {
+                Some(0) => return (visited, true),
+                Some(s) if s == sign => friendly_neighbors.push(neighbor),
+                _ => ()
+            };
         }
 
-        inner(&self, vertex, vec![], match self.get(vertex) {
+        visited.push(vertex);
+
+        for neighbor in friendly_neighbors.into_iter() {
+            if visited.contains(&neighbor) {
+                continue;
+            }
+
+            visited = match self.has_liberties_inner(neighbor, visited, sign) {
+                (x, true) => return (x, true),
+                (x, false) => x
+            };
+        }
+
+        (visited, false)
+    }
+
+    pub fn has_liberties(&self, vertex: Vertex) -> bool {
+        self.has_liberties_inner(vertex, vec![], match self.get(vertex) {
             Some(x) => x,
             None => return false
         }).1
@@ -186,7 +180,7 @@ impl PseudoBoard {
             let pos_dead = pos_area.iter().cloned()
                 .filter(|&v| self.get(v) == Some(-1)).collect::<Vec<_>>();
             let neg_dead = neg_area.iter().cloned()
-                .filter(|&v| self.get(v) ==Some( 1)).collect::<Vec<_>>();
+                .filter(|&v| self.get(v) == Some(1)).collect::<Vec<_>>();
             let pos_diff = pos_area.iter().cloned()
                 .filter(|v| !pos_dead.contains(v) && !neg_area.contains(v)).count();
             let neg_diff = neg_area.iter().cloned()
