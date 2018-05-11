@@ -33,7 +33,7 @@ where T: Fn() -> f64 {
             let chain = board.get_chain(vertex);
             let probability = chain.iter()
                 .map(|&Vertex(x, y)| map[y][x])
-                .sum::<f64>() / chain.len() as f64;
+                .sum::<i32>() as f64 / chain.len() as f64;
             let new_sign = probability.signum() as Sign;
 
             for &v in &chain {
@@ -62,7 +62,9 @@ where T: Fn() -> f64 {
         }
 
         let related = board.get_related_chains(vertex);
-        let dead_probability = related.iter().filter(|&v| result.contains(v)).count() as f64 / related.len() as f64;
+        let dead_probability = related.iter()
+            .filter(|&v| result.contains(v)).count() as f64
+            / related.len() as f64;
 
         for &v in &related {
             if dead_probability > 0.5 {
@@ -76,7 +78,7 @@ where T: Fn() -> f64 {
     updated_result
 }
 
-pub fn get_probability_map<T>(data: BoardData, iterations: usize, random: T) -> Vec<Vec<f64>>
+pub fn get_probability_map<T>(data: BoardData, iterations: usize, random: T) -> Vec<Vec<i32>>
 where T: Fn() -> f64 {
     let board = PseudoBoard::new(data);
     let mut result = (0..board.height).map(|_| {
@@ -89,12 +91,22 @@ where T: Fn() -> f64 {
 
         for x in 0..board.width {
             for y in 0..board.height {
-                let s = area_map[y][x];
+                let s = match area_map.get(y) {
+                    Some(row) => row.get(x).cloned().unwrap_or(0),
+                    None => continue
+                };
 
-                if s == -1 {
-                    result[y][x].0 += 1;
-                } else if s == 1 {
-                    result[y][x].1 += 1;
+                let mut slots = match result.get_mut(y) {
+                    Some(row) => row.get_mut(x),
+                    None => continue
+                };
+
+                if let Some(mut slots) = slots {
+                    if s == -1 {
+                        slots.0 += 1;
+                    } else if s == 1 {
+                        slots.1 += 1;
+                    }
                 }
             }
         }
@@ -104,8 +116,8 @@ where T: Fn() -> f64 {
     .map(|row| {
         row.into_iter()
         .map(|(n, p)| match p + n {
-            0 => 0.0,
-            _ => (p as f64 / (p + n) as f64) * 2.0 - 1.0
+            0 => 0,
+            _ => ((p as f64 / (p + n) as f64) * 2000.0 - 1000.0).round() as i32
         })
         .collect()
     })

@@ -14,7 +14,7 @@ impl PseudoBoard {
         let height = data.len();
         let width = match data.len() {
             0 => 0,
-            _ => data[0].len()
+            _ => data.get(0).unwrap_or(&vec![]).len()
         };
 
         PseudoBoard {width, height, data}
