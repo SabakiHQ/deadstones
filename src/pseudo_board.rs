@@ -31,14 +31,6 @@ impl PseudoBoard {
         self.data[y][x] = sign;
     }
 
-    pub fn is_point_chain(&self, vertex: Vertex) -> bool {
-        let sign = self.get(vertex);
-
-        !vertex.get_neighbors()
-        .into_iter()
-        .any(|v| self.get(v) == sign)
-    }
-
     pub fn get_connected_component(&self, vertex: Vertex, signs: &[Sign]) -> Vec<Vertex> {
         fn inner(
             board: &PseudoBoard,
@@ -152,7 +144,6 @@ impl PseudoBoard {
         }
 
         let mut dead = vec![];
-        let mut dead_chains = 0;
 
         for &neighbor in neighbors.iter() {
             match self.get(neighbor) {
@@ -162,7 +153,6 @@ impl PseudoBoard {
             }
 
             let chain = self.get_chain(neighbor);
-            dead_chains += 1;
 
             for c in chain.into_iter() {
                 self.set(c, 0);
