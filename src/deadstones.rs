@@ -15,7 +15,7 @@ where T: Fn() -> f64 {
         }
     }
 
-    let map = get_probability_map(board.data.clone(), iterations, || random());
+    let map = get_probability_map(board.data.clone(), iterations, &random);
     let mut done = vec![];
 
     for x in 0..board.width {
@@ -84,8 +84,8 @@ where T: Fn() -> f64 {
     }).collect::<Vec<_>>();
 
     for _ in 0..iterations {
-        let s = if random() - 0.5 < 0.0 { -1 } else { 1 };
-        let area_map = play_till_end(board.data.clone(), s, || random());
+        let sign = if random() - 0.5 < 0.0 { -1 } else { 1 };
+        let area_map = play_till_end(board.data.clone(), sign, &random);
 
         for x in 0..board.width {
             for y in 0..board.height {
@@ -104,8 +104,8 @@ where T: Fn() -> f64 {
     .map(|row| {
         row.into_iter()
         .map(|(n, p)| match p + n {
-            0 => 0f64,
-            _ => p as f64 / (p + n) as f64
+            0 => 0.0,
+            _ => (p as f64 / (p + n) as f64) * 2.0 - 1.0
         })
         .collect()
     })
