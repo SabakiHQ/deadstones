@@ -1,3 +1,4 @@
+.nyc_output/
 target/
 wasm/
 node_modules/

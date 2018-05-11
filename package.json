@@ -26,12 +26,14 @@
     "compile": "cargo build --target wasm32-unknown-unknown --release",
     "pack": "mkdirp ./dist && wasm-bindgen ./target/wasm32-unknown-unknown/release/deadstones.wasm --out-dir ./dist --no-typescript --nodejs",
     "build": "npm run compile && npm run pack",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "test": "tap tests/*.test.js"
   },
   "files": [
     "wasm"
   ],
   "devDependencies": {
-    "mkdirp": "^0.5.1"
+    "mkdirp": "^0.5.1",
+    "tap": "^11.1.5"
   }
 }
