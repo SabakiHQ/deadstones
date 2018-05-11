@@ -133,7 +133,7 @@ where T: Fn() -> f64 {
     let mut finished = vec![false, false];
     let mut iterations = 0;
 
-    while free_vertices.len() > 0 && finished.contains(&false) && iterations < 10000 {
+    while free_vertices.len() > 0 && finished.contains(&false) && iterations < 1000 {
         let mut made_move = false;
 
         while free_vertices.len() > 0 {
@@ -163,34 +163,34 @@ where T: Fn() -> f64 {
 
     // Patch holes
 
-    // let vertices = (0..width).flat_map(|x| {
-    //     (0..height).map(move |y| Vertex(x, y))
-    // });
-    //
-    // for vertex in vertices {
-    //     if board.get(vertex) != Some(0) {
-    //         continue;
-    //     }
-    //
-    //     let neighbors = vertex.get_neighbors();
-    //     let mut sign = 0;
-    //
-    //     for v in neighbors.into_iter() {
-    //         let s = match board.get(v) {
-    //             Some(x) => x,
-    //             None => continue
-    //         };
-    //
-    //         if s == 1 || s == -1 {
-    //             sign = s;
-    //             break;
-    //         }
-    //     }
-    //
-    //     if sign != 0 {
-    //         board.set(vertex, sign);
-    //     }
-    // }
+    let vertices = (0..width).flat_map(|x| {
+        (0..height).map(move |y| Vertex(x, y))
+    });
+
+    for vertex in vertices {
+        if board.get(vertex) != Some(0) {
+            continue;
+        }
+
+        let neighbors = vertex.get_neighbors();
+        let mut sign = 0;
+
+        for v in neighbors.into_iter() {
+            let s = match board.get(v) {
+                Some(x) => x,
+                None => continue
+            };
+
+            if s == 1 || s == -1 {
+                sign = s;
+                break;
+            }
+        }
+
+        if sign != 0 {
+            board.set(vertex, sign);
+        }
+    }
 
     board.data
 }

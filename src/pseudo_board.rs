@@ -134,7 +134,6 @@ impl PseudoBoard {
 
         let neighbors = vertex.get_neighbors();
         let mut check_capture = false;
-        let mut check_multiple_dead_chains = false;
 
         if neighbors.iter().all(|&neighbor| {
             match self.get(neighbor) {
@@ -149,11 +148,7 @@ impl PseudoBoard {
         self.set(vertex, sign);
 
         if !self.has_liberties(vertex) {
-            if self.is_point_chain(vertex) {
-                check_multiple_dead_chains = true;
-            } else {
-                check_capture = true;
-            }
+            check_capture = true;
         }
 
         let mut dead = vec![];
@@ -173,15 +168,6 @@ impl PseudoBoard {
                 self.set(c, 0);
                 dead.push(c);
             }
-        }
-
-        if check_multiple_dead_chains && dead_chains <= 1 {
-            for &d in &dead {
-                self.set(d, -sign);
-            }
-
-            self.set(vertex, 0);
-            return None;
         }
 
         if check_capture && dead.len() == 0 {
