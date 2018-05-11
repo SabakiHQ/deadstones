@@ -4,45 +4,43 @@ extern crate wasm_bindgen;
 
 use wasm_bindgen::prelude::*;
 
+mod rand;
 mod deadstones;
-mod data;
-mod vertex;
 mod pseudo_board;
 
+use rand::Rand;
+use pseudo_board::*;
+
 #[wasm_bindgen]
-extern {
-    #[wasm_bindgen(js_namespace = Math)]
-    fn random() -> f64;
+pub fn guess(data: Vec<Sign>, width: usize, finished: bool, iterations: usize) -> Vec<i32> {
+    let board = PseudoBoard::new(data, width);
+
+    deadstones::guess(board, finished, iterations)
+    .into_iter()
+    .map(|x| x as i32)
+    .collect()
 }
 
 #[wasm_bindgen]
-pub fn guess(data: Vec<i8>, width: usize, finished: bool, iterations: usize) -> Vec<u32> {
-    let data = data::parse_boarddata(&data, width);
-    let result = deadstones::guess(data, finished, iterations, || random());
-
-    data::flatten_vertices(result)
+pub fn get_probability_map(data: Vec<Sign>, width: usize, iterations: usize) -> Vec<f32> {
+    let board = PseudoBoard::new(data, width);
+    
+    deadstones::get_probability_map(board, iterations)
 }
 
 #[wasm_bindgen]
-pub fn get_probability_map(data: Vec<i8>, width: usize, iterations: usize) -> Vec<i32> {
-    let data = data::parse_boarddata(&data, width);
-    let result = deadstones::get_probability_map(data, iterations, || random());
+pub fn play_till_end(data: Vec<Sign>, width: usize, sign: Sign) -> Vec<Sign> {
+    let board = PseudoBoard::new(data, width);
 
-    data::flatten_board_data(result)
+    deadstones::play_till_end(board, sign, &mut Rand::new(5555)).data
 }
 
 #[wasm_bindgen]
-pub fn play_till_end(data: Vec<i8>, width: usize, sign: i8) -> Vec<i8> {
-    let data = data::parse_boarddata(&data, width);
-    let result = deadstones::play_till_end(data, sign, || random());
+pub fn get_floating_stones(data: Vec<Sign>, width: usize) -> Vec<i32> {
+    let board = PseudoBoard::new(data, width);
 
-    data::flatten_board_data(result)
-}
-
-#[wasm_bindgen]
-pub fn get_floating_stones(data: Vec<i8>, width: usize) -> Vec<u32> {
-    let data = data::parse_boarddata(&data, width);
-    let result = deadstones::get_floating_stones(data);
-
-    data::flatten_vertices(result)
+    board.get_floating_stones()
+    .into_iter()
+    .map(|x| x as i32)
+    .collect()
 }

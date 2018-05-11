@@ -1,42 +1,54 @@
-use vertex::*;
-
-pub type BoardData = Vec<Vec<Sign>>;
+pub type Sign = i8;
+pub type Vertex = usize;
 
 #[derive(Debug, Clone)]
 pub struct PseudoBoard {
+    pub data: Vec<Sign>,
     pub width: usize,
-    pub height: usize,
-    pub data: BoardData
+    pub height: usize
 }
 
 impl PseudoBoard {
-    pub fn new(data: BoardData) -> PseudoBoard {
-        let height = data.len();
-        let width = match data.len() {
-            0 => 0,
-            _ => data.get(0).unwrap_or(&vec![]).len()
+    pub fn new(data: Vec<Sign>, width: usize) -> PseudoBoard {
+        let height = match data.len().checked_div(width) {
+            Some(x) => x,
+            None => 0
         };
 
-        PseudoBoard {width, height, data}
+        PseudoBoard {data, width, height}
     }
 
-    pub fn get(&self, Vertex(x, y): Vertex) -> Option<Sign> {
-        match self.data.get(y) {
-            None => None,
-            Some(row) => row.get(x).cloned()
+    pub fn get(&self, v: Vertex) -> Option<Sign> {
+        self.data.get(v).cloned()
+    }
+
+    pub fn set(&mut self, v: Vertex, sign: Sign) {
+        if let Some(x) = self.data.get_mut(v) {
+            *x = sign;
         }
     }
 
-    pub fn set(&mut self, Vertex(x, y): Vertex, sign: Sign) {
-        if let Some(row) = self.data.get_mut(y) {
-            if let Some(col) = row.get_mut(x) {
-                *col = sign;
-            }
+    pub fn get_neighbors(&self, v: Vertex) -> Vec<Vertex> {
+        let mut result = vec![v - self.width, v + self.width];
+
+        if v % self.width > 0 {
+            result.push(v - 1);
         }
+
+        if v % self.width < self.width - 1 {
+            result.push(v + 1);
+        }
+
+        result
     }
 
-    fn get_connected_component_inner(&self, vertex: Vertex, signs: &[Sign], mut result: Vec<Vertex>) -> Vec<Vertex> {
-        for neighbor in vertex.get_neighbors().into_iter() {
+    fn get_connected_component_inner(
+        &self,
+        vertex: Vertex,
+        signs: &[Sign],
+        mut result: Vec<Vertex>
+    ) -> Vec<Vertex> {
+        for neighbor in self.get_neighbors(vertex).into_iter() {
             let s = match self.get(neighbor) {
                 Some(x) => x,
                 None => continue
@@ -78,8 +90,13 @@ impl PseudoBoard {
         self.get_connected_component(vertex, &vec![sign])
     }
 
-    fn has_liberties_inner(&self, vertex: Vertex, mut visited: Vec<Vertex>, sign: Sign) -> (Vec<Vertex>, bool) {
-        let neighbors = vertex.get_neighbors();
+    fn has_liberties_inner(
+        &self,
+        vertex: Vertex,
+        mut visited: Vec<Vertex>,
+        sign: Sign
+    ) -> (Vec<Vertex>, bool) {
+        let neighbors = self.get_neighbors(vertex);
         let mut friendly_neighbors = vec![];
 
         for neighbor in neighbors.into_iter() {
@@ -118,7 +135,7 @@ impl PseudoBoard {
             return None;
         }
 
-        let neighbors = vertex.get_neighbors();
+        let neighbors = self.get_neighbors(vertex);
         let mut check_capture = false;
 
         if neighbors.iter().all(|&neighbor| {
@@ -166,11 +183,7 @@ impl PseudoBoard {
         let mut done = vec![];
         let mut result = vec![];
 
-        let vertices = (0..self.width).flat_map(|x| {
-            (0..self.height).map(move |y| Vertex(x, y))
-        });
-
-        for vertex in vertices {
+        for vertex in 0..self.data.len() {
             if self.get(vertex) != Some(0) || done.contains(&vertex) {
                 continue;
             }
