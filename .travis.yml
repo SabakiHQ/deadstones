@@ -2,6 +2,7 @@ language: rust
 rust: nightly
 before_script:
   - nvm install 8
+  - node -v
   - rustup target add wasm32-unknown-unknown
   - cargo install wasm-bindgen-cli
   - npm install

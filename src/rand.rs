@@ -31,8 +31,4 @@ impl Rand {
 
         a + (self.rand() % m) as i32
     }
-
-    pub fn float(&mut self) -> f32 {
-        self.rand() as f32 / u32::max_value() as f32
-    }
 }

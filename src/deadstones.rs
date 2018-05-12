@@ -3,28 +3,28 @@ use pseudo_board::*;
 
 pub fn guess(mut board: PseudoBoard, finished: bool, iterations: usize, rand: &mut Rand) -> Vec<Vertex> {
     let mut result = vec![];
-    let mut floating = vec![];
+    let floating = match finished {
+        true => {
+            let floating = board.get_floating_stones();
 
-    if finished {
-        floating = board.get_floating_stones();
+            for &v in &floating {
+                board.set(v, 0);
+            }
 
-        for &v in &floating {
-            board.set(v, 0);
-        }
-    }
+            floating
+        },
+        false => vec![]
+    };
 
     let map = get_probability_map(board.clone(), iterations, rand);
     let mut done = vec![];
 
     for vertex in 0..map.len() {
         let sign = match board.get(vertex) {
-            Some(x) => x,
-            None => continue
+            Some(0) => continue,
+            Some(x) if !done.contains(&vertex) => x,
+            _ => continue
         };
-
-        if sign == 0 || done.contains(&vertex) {
-            continue;
-        }
 
         let chain = board.get_chain(vertex);
         let probability = chain.iter()
@@ -42,7 +42,6 @@ pub fn guess(mut board: PseudoBoard, finished: bool, iterations: usize, rand: &m
     }
 
     if !finished {
-        result.append(&mut floating);
         return result;
     }
 
@@ -56,18 +55,17 @@ pub fn guess(mut board: PseudoBoard, finished: bool, iterations: usize, rand: &m
             continue;
         }
 
-        let related = board.get_related_chains(vertex);
+        let mut related = board.get_related_chains(vertex);
         let dead_probability = related.iter()
-            .filter(|&v| result.contains(v)).count() as f32
+            .filter(|&v| result.contains(v))
+            .count() as f32
             / related.len() as f32;
 
-        for &v in &related {
-            if dead_probability > 0.5 {
-                updated_result.push(v);
-            }
-
-            done.push(v);
+        if dead_probability > 0.5 {
+            updated_result.append(&mut related.clone());
         }
+
+        done.append(&mut related);
     }
 
     updated_result
@@ -76,17 +74,17 @@ pub fn guess(mut board: PseudoBoard, finished: bool, iterations: usize, rand: &m
 pub fn get_probability_map(board: PseudoBoard, iterations: usize, rand: &mut Rand) -> Vec<f32> {
     let mut result = board.data.iter().map(|_| (0, 0)).collect::<Vec<_>>();
 
-    for _ in 0..iterations {
-        let sign = if rand.float() - 0.5 < 0.0 { -1 } else { 1 };
+    for i in 0..iterations {
+        let sign = if i < iterations / 2 { -1 } else { 1 };
         let area_map = play_till_end(board.clone(), sign, rand);
 
-        for i in 0..area_map.data.len() {
-            let s = match area_map.get(i) {
+        for v in 0..area_map.data.len() {
+            let s = match area_map.get(v) {
                 Some(x) => x,
                 None => continue
             };
 
-            if let Some(mut slots) = result.get_mut(i) {
+            if let Some(mut slots) = result.get_mut(v) {
                 if s == -1 {
                     slots.0 += 1;
                 } else if s == 1 {
@@ -96,44 +94,52 @@ pub fn get_probability_map(board: PseudoBoard, iterations: usize, rand: &mut Ran
         }
     }
 
-    result.into_iter()
+    result
+    .into_iter()
     .map(|(n, p)| match p + n {
         0 => 0.0,
-        _ => (p as f32 / (p + n) as f32) * 2.0 - 1.0
+        _ => p as f32 * 2.0 / (p + n) as f32 - 1.0
     })
     .collect()
 }
 
 pub fn play_till_end(mut board: PseudoBoard, mut sign: Sign, rand: &mut Rand) -> PseudoBoard {
     let mut illegal_vertices = vec![];
+    let mut finished = (false, false);
     let mut free_vertices = (0..board.data.len())
         .filter(|&v| board.get(v) == Some(0))
         .collect::<Vec<_>>();
 
-    let mut finished = vec![false, false];
-
-    while free_vertices.len() > 0 && finished.contains(&false) {
+    while free_vertices.len() > 0 && (!finished.0 || !finished.1) {
         let mut made_move = false;
 
         while free_vertices.len() > 0 {
             let random_index = rand.range(0, free_vertices.len() as i32) as usize;
-            let vertex = free_vertices[random_index];
+            let vertex = *free_vertices.get(random_index).unwrap_or(&0);
 
             free_vertices.remove(random_index);
 
             if let Some(mut freed_vertices) = board.make_pseudo_move(sign, vertex) {
                 free_vertices.append(&mut freed_vertices);
 
-                finished[if sign < 0 { 0 } else { 1 }] = false;
-                made_move = true;
+                if sign < 0 {
+                    finished.0 = false;
+                } else {
+                    finished.1 = false;
+                }
 
+                made_move = true;
                 break;
             } else {
                 illegal_vertices.push(vertex);
             }
         }
 
-        finished[if sign > 0 { 0 } else { 1 }] = !made_move;
+        if sign > 0 {
+            finished.0 = !made_move;
+        } else {
+            finished.1 = !made_move;
+        }
 
         free_vertices.append(&mut illegal_vertices);
         sign = -sign;

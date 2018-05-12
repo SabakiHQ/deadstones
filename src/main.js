@@ -5,9 +5,16 @@ const parseBoard = data => [
     data.length > 0 ? data[0].length : 0
 ]
 
-const parseVertices = (indices, width) => [...indices].map(i => [i % width, Math.floor(i / width)])
-const parseGrid = (values, width) => [...Array(values.length / width)]
-    .map((_, y) => [...values].slice(y * width, (y + 1) * width))
+const parseVertices = (indices, width) => [...indices].map(i => {
+    let x = i % width
+    return [x, (i - x) / width]
+})
+
+const parseGrid = (values, width) => {
+    values = [...values]
+    return [...Array(values.length / width)]
+        .map((_, y) => values.slice(y * width, (y + 1) * width))
+}
 
 exports.guess = function(data, {finished = false, iterations = 100} = {}) {
     let [newData, width] = parseBoard(data)

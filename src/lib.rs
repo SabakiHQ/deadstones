@@ -2,14 +2,13 @@
 
 extern crate wasm_bindgen;
 
-use wasm_bindgen::prelude::*;
-
 mod rand;
 mod deadstones;
 mod pseudo_board;
 
 use rand::Rand;
 use pseudo_board::*;
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub fn guess(data: Vec<Sign>, width: usize, finished: bool, iterations: usize, seed: u32) -> Vec<i32> {

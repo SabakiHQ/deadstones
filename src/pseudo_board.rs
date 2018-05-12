@@ -28,13 +28,6 @@ impl PseudoBoard {
         }
     }
 
-    pub fn is_point_chain(&self, v: Vertex) -> bool {
-        let sign = self.get(v);
-
-        !self.get_neighbors(v).into_iter()
-        .any(|n| self.get(n) == sign)
-    }
-
     pub fn get_neighbors(&self, v: Vertex) -> Vec<Vertex> {
         let mut result = vec![v - self.width, v + self.width];
 
@@ -49,6 +42,13 @@ impl PseudoBoard {
         result
     }
 
+    pub fn is_point_chain(&self, v: Vertex) -> bool {
+        let sign = self.get(v);
+
+        self.get_neighbors(v).into_iter()
+        .all(|n| self.get(n) != sign)
+    }
+
     fn get_connected_component_inner(
         &self,
         vertex: Vertex,
@@ -61,12 +61,10 @@ impl PseudoBoard {
                 None => continue
             };
 
-            if !signs.contains(&s) || result.contains(&neighbor) {
-                continue;
+            if signs.contains(&s) && !result.contains(&neighbor) {
+                result.push(neighbor);
+                result = self.get_connected_component_inner(neighbor, signs, result);
             }
-
-            result.push(neighbor);
-            result = self.get_connected_component_inner(neighbor, signs, result);
         }
 
         result
@@ -82,7 +80,7 @@ impl PseudoBoard {
             None => return vec![]
         };
 
-        self.get_connected_component(vertex, &vec![sign, 0])
+        self.get_connected_component(vertex, &[sign, 0])
         .into_iter()
         .filter(|&v| self.get(v) == Some(sign))
         .collect()
@@ -94,7 +92,7 @@ impl PseudoBoard {
             None => return vec![]
         };
 
-        self.get_connected_component(vertex, &vec![sign])
+        self.get_connected_component(vertex, &[sign])
     }
 
     fn has_liberties_inner(
@@ -103,10 +101,9 @@ impl PseudoBoard {
         mut visited: Vec<Vertex>,
         sign: Sign
     ) -> (Vec<Vertex>, bool) {
-        let neighbors = self.get_neighbors(vertex);
         let mut friendly_neighbors = vec![];
 
-        for neighbor in neighbors.into_iter() {
+        for neighbor in self.get_neighbors(vertex).into_iter() {
             match self.get(neighbor) {
                 Some(0) => return (visited, true),
                 Some(s) if s == sign => friendly_neighbors.push(neighbor),
@@ -165,7 +162,7 @@ impl PseudoBoard {
         let mut dead = vec![];
         let mut dead_chains = 0;
 
-        for &neighbor in neighbors.iter() {
+        for neighbor in neighbors.into_iter() {
             if self.get(neighbor) != Some(-sign) || self.has_liberties(neighbor) {
                 continue;
             }
@@ -212,26 +209,16 @@ impl PseudoBoard {
             let neg_diff = neg_area.iter().cloned()
                 .filter(|v| !neg_dead.contains(v) && !pos_area.contains(v)).count();
 
-            let mut sign = 0;
+            let favor_neg = neg_diff <= 1 && neg_dead.len() <= pos_dead.len();
+            let favor_pos = pos_diff <= 1 && pos_dead.len() <= neg_dead.len();
 
-            if neg_diff <= 1 && neg_dead.len() <= pos_dead.len() {
-                sign -= 1;
-            }
-
-            if pos_diff <= 1 && pos_dead.len() <= neg_dead.len() {
-                sign += 1;
-            }
-
-            let (actual_area, mut actual_dead) = match sign {
-                1 => (pos_area, pos_dead),
-                -1 => (neg_area, neg_dead),
+            let (mut actual_area, mut actual_dead) = match (favor_neg, favor_pos) {
+                (false, true) => (pos_area, pos_dead),
+                (true, false) => (neg_area, neg_dead),
                 _ => (self.get_chain(vertex), vec![])
             };
 
-            for &v in actual_area.iter() {
-                done.push(v);
-            }
-
+            done.append(&mut actual_area);
             result.append(&mut actual_dead);
         }
 
