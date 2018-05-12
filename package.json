@@ -25,8 +25,9 @@
   "scripts": {
     "compile": "cargo build --target wasm32-unknown-unknown --release",
     "pack": "mkdirp ./wasm && wasm-bindgen ./target/wasm32-unknown-unknown/release/deadstones.wasm --out-dir ./wasm --no-typescript --nodejs",
+    "optimize": "wasm-snip --snip-rust-fmt-code --snip-rust-panicking-code ./wasm/deadstones_bg.wasm -o ./wasm/deadstones_bg.wasm",
     "build": "npm run compile && npm run pack",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run build && npm run optimize",
     "test": "tap tests/*.test.js"
   },
   "files": [
