@@ -9,7 +9,7 @@ pub struct Rand {
 
 impl Rand {
     pub fn new(seed: u32) -> Rand {
-        Rand{
+        Rand {
             x: KX ^ seed, y: KY ^ seed, z: KZ, w: KW
         }
     }

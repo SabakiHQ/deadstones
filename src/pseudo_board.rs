@@ -1,7 +1,7 @@
 pub type Sign = i8;
 pub type Vertex = usize;
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct PseudoBoard {
     pub data: Vec<Sign>,
     pub width: usize,
