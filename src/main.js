@@ -9,7 +9,7 @@ const parseVertices = (indices, width) => [...indices].map(i => [i % width, Math
 const parseGrid = (values, width) => [...Array(values.length / width)]
     .map((_, y) => [...values].slice(y * width, (y + 1) * width))
 
-exports.guess = function(data, {finished = false, iterations = 50} = {}) {
+exports.guess = function(data, {finished = false, iterations = 100} = {}) {
     let [newData, width] = parseBoard(data)
     let indices = lib.guess(newData, width, finished, iterations)
 
