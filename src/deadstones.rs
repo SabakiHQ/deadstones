@@ -1,7 +1,7 @@
 use rand::Rand;
 use pseudo_board::*;
 
-pub fn guess(mut board: PseudoBoard, finished: bool, iterations: usize) -> Vec<Vertex> {
+pub fn guess(mut board: PseudoBoard, finished: bool, iterations: usize, rand: &mut Rand) -> Vec<Vertex> {
     let mut result = vec![];
     let mut floating = vec![];
 
@@ -13,7 +13,7 @@ pub fn guess(mut board: PseudoBoard, finished: bool, iterations: usize) -> Vec<V
         }
     }
 
-    let map = get_probability_map(board.clone(), iterations);
+    let map = get_probability_map(board.clone(), iterations, rand);
     let mut done = vec![];
 
     for vertex in 0..map.len() {
@@ -73,13 +73,12 @@ pub fn guess(mut board: PseudoBoard, finished: bool, iterations: usize) -> Vec<V
     updated_result
 }
 
-pub fn get_probability_map(board: PseudoBoard, iterations: usize) -> Vec<f32> {
+pub fn get_probability_map(board: PseudoBoard, iterations: usize, rand: &mut Rand) -> Vec<f32> {
     let mut result = board.data.iter().map(|_| (0, 0)).collect::<Vec<_>>();
-    let mut rand = Rand::new(347564);
 
     for _ in 0..iterations {
         let sign = if rand.float() - 0.5 < 0.0 { -1 } else { 1 };
-        let area_map = play_till_end(board.clone(), sign, &mut rand);
+        let area_map = play_till_end(board.clone(), sign, rand);
 
         for i in 0..area_map.data.len() {
             let s = match area_map.get(i) {
