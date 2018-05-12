@@ -75,7 +75,7 @@ pub fn guess(mut board: PseudoBoard, finished: bool, iterations: usize) -> Vec<V
 
 pub fn get_probability_map(board: PseudoBoard, iterations: usize) -> Vec<f32> {
     let mut result = board.data.iter().map(|_| (0, 0)).collect::<Vec<_>>();
-    let mut rand = Rand::new(5555);
+    let mut rand = Rand::new(347564);
 
     for _ in 0..iterations {
         let sign = if rand.float() - 0.5 < 0.0 { -1 } else { 1 };

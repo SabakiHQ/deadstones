@@ -32,7 +32,7 @@ pub fn get_probability_map(data: Vec<Sign>, width: usize, iterations: usize) -> 
 pub fn play_till_end(data: Vec<Sign>, width: usize, sign: Sign) -> Vec<Sign> {
     let board = PseudoBoard::new(data, width);
 
-    deadstones::play_till_end(board, sign, &mut Rand::new(5555)).data
+    deadstones::play_till_end(board, sign, &mut Rand::new(978236)).data
 }
 
 #[wasm_bindgen]
