@@ -167,13 +167,14 @@ impl PseudoBoard {
                 continue;
             }
 
-            let chain = self.get_chain(neighbor);
+            let mut chain = self.get_chain(neighbor);
             dead_chains += 1;
 
-            for c in chain.into_iter() {
+            for &c in &chain {
                 self.set(c, 0);
-                dead.push(c);
             }
+
+            dead.append(&mut chain);
         }
 
         if check_multi_dead_chains && dead_chains <= 1 

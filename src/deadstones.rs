@@ -26,19 +26,16 @@ pub fn guess(mut board: PseudoBoard, finished: bool, iterations: usize, rand: &m
             _ => continue
         };
 
-        let chain = board.get_chain(vertex);
+        let mut chain = board.get_chain(vertex);
         let probability = chain.iter()
             .filter_map(|&v| map.get(v).cloned())
             .sum::<f32>() / chain.len() as f32;
-        let new_sign = probability.signum() as Sign;
 
-        for &v in &chain {
-            if new_sign == -sign {
-                result.push(v);
-            }
-
-            done.push(v);
+        if probability.signum() as Sign == -sign {
+            result.append(&mut chain.clone());
         }
+
+        done.append(&mut chain);
     }
 
     if !finished {
