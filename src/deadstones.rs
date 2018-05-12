@@ -111,9 +111,8 @@ pub fn play_till_end(mut board: PseudoBoard, mut sign: Sign, rand: &mut Rand) ->
         .collect::<Vec<_>>();
 
     let mut finished = vec![false, false];
-    let mut iterations = 0;
 
-    while free_vertices.len() > 0 && finished.contains(&false) && iterations < 500 {
+    while free_vertices.len() > 0 && finished.contains(&false) {
         let mut made_move = false;
 
         while free_vertices.len() > 0 {
@@ -138,7 +137,29 @@ pub fn play_till_end(mut board: PseudoBoard, mut sign: Sign, rand: &mut Rand) ->
 
         free_vertices.append(&mut illegal_vertices);
         sign = -sign;
-        iterations += 1;
+    }
+
+    // Patch holes
+
+    for vertex in 0..board.data.len() {
+        if board.get(vertex) != Some(0) {
+            continue;
+        }
+
+        let mut sign = 0;
+
+        for n in board.get_neighbors(vertex).into_iter() {
+            let s = board.get(n);
+
+            if s == Some(1) || s == Some(-1) {
+                sign = s.unwrap_or(0);
+                break;
+            }
+        }
+
+        if sign != 0 {
+            board.set(vertex, sign);
+        }
     }
 
     board

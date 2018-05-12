@@ -28,6 +28,13 @@ impl PseudoBoard {
         }
     }
 
+    pub fn is_point_chain(&self, v: Vertex) -> bool {
+        let sign = self.get(v);
+
+        !self.get_neighbors(v).into_iter()
+        .any(|n| self.get(n) == sign)
+    }
+
     pub fn get_neighbors(&self, v: Vertex) -> Vec<Vertex> {
         let mut result = vec![v - self.width, v + self.width];
 
@@ -131,12 +138,9 @@ impl PseudoBoard {
     }
 
     pub fn make_pseudo_move(&mut self, sign: Sign, vertex: Vertex) -> Option<Vec<Vertex>> {
-        if sign != 1 && sign != -1 {
-            return None;
-        }
-
         let neighbors = self.get_neighbors(vertex);
         let mut check_capture = false;
+        let mut check_multi_dead_chains = false;
 
         if neighbors.iter().all(|&neighbor| {
             match self.get(neighbor) {
@@ -151,19 +155,23 @@ impl PseudoBoard {
         self.set(vertex, sign);
 
         if !self.has_liberties(vertex) {
-            check_capture = true;
+            if self.is_point_chain(vertex) {
+                check_multi_dead_chains = true;
+            } else {
+                check_capture = true;
+            }
         }
 
         let mut dead = vec![];
+        let mut dead_chains = 0;
 
         for &neighbor in neighbors.iter() {
-            match self.get(neighbor) {
-                Some(s) if s != -sign => continue,
-                Some(_) if self.has_liberties(neighbor) => continue,
-                _ => ()
+            if self.get(neighbor) != Some(-sign) || self.has_liberties(neighbor) {
+                continue;
             }
 
             let chain = self.get_chain(neighbor);
+            dead_chains += 1;
 
             for c in chain.into_iter() {
                 self.set(c, 0);
@@ -171,7 +179,12 @@ impl PseudoBoard {
             }
         }
 
-        if check_capture && dead.len() == 0 {
+        if check_multi_dead_chains && dead_chains <= 1 
+        || check_capture && dead.len() == 0 {
+            for &d in &dead {
+                self.set(d, -sign);
+            }
+
             self.set(vertex, 0);
             return None;
         }
