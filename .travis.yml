@@ -2,9 +2,8 @@ language: rust
 rust: nightly
 before_script:
   - nvm install 8
-  - node -v
   - rustup target add wasm32-unknown-unknown
-  - cargo install wasm-bindgen-cli
+  - cargo install wasm-bindgen-cli --version 0.2.9
   - npm install
   - npm run build
 script:

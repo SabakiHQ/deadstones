@@ -11,12 +11,12 @@ use pseudo_board::*;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-pub fn guess(data: Vec<Sign>, width: usize, finished: bool, iterations: usize, seed: u32) -> Vec<i32> {
+pub fn guess(data: Vec<Sign>, width: usize, finished: bool, iterations: usize, seed: u32) -> Vec<u32> {
     let board = PseudoBoard::new(data, width);
 
     deadstones::guess(board, finished, iterations, &mut Rand::new(seed))
     .into_iter()
-    .map(|x| x as i32)
+    .map(|x| x as u32)
     .collect()
 }
 
@@ -35,11 +35,11 @@ pub fn play_till_end(data: Vec<Sign>, width: usize, sign: Sign, seed: u32) -> Ve
 }
 
 #[wasm_bindgen]
-pub fn get_floating_stones(data: Vec<Sign>, width: usize) -> Vec<i32> {
+pub fn get_floating_stones(data: Vec<Sign>, width: usize) -> Vec<u32> {
     let board = PseudoBoard::new(data, width);
 
     board.get_floating_stones()
     .into_iter()
-    .map(|x| x as i32)
+    .map(|x| x as u32)
     .collect()
 }

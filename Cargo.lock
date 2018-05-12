@@ -2,7 +2,7 @@
 name = "deadstones"
 version = "2.0.0"
 dependencies = [
- "wasm-bindgen 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
+ "wasm-bindgen 0.2.9 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -73,40 +73,40 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "wasm-bindgen"
-version = "0.2.8"
+version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "wasm-bindgen-macro 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
+ "wasm-bindgen-macro 0.2.9 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "wasm-bindgen-backend"
-version = "0.2.8"
+version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "proc-macro2 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 0.5.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.17 (registry+https://github.com/rust-lang/crates.io-index)",
  "syn 0.13.7 (registry+https://github.com/rust-lang/crates.io-index)",
- "wasm-bindgen-shared 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
+ "wasm-bindgen-shared 0.2.9 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "wasm-bindgen-macro"
-version = "0.2.8"
+version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "proc-macro2 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 0.5.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.17 (registry+https://github.com/rust-lang/crates.io-index)",
  "syn 0.13.7 (registry+https://github.com/rust-lang/crates.io-index)",
- "wasm-bindgen-backend 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
- "wasm-bindgen-shared 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
+ "wasm-bindgen-backend 0.2.9 (registry+https://github.com/rust-lang/crates.io-index)",
+ "wasm-bindgen-shared 0.2.9 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "wasm-bindgen-shared"
-version = "0.2.8"
+version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "serde 1.0.52 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -123,7 +123,7 @@ dependencies = [
 "checksum serde_json 1.0.17 (registry+https://github.com/rust-lang/crates.io-index)" = "f3ad6d546e765177cf3dded3c2e424a8040f870083a0e64064746b958ece9cb1"
 "checksum syn 0.13.7 (registry+https://github.com/rust-lang/crates.io-index)" = "61b8f1b737f929c6516ba46a3133fd6d5215ad8a62f66760f851f7048aebedfb"
 "checksum unicode-xid 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "fc72304796d0818e357ead4e000d19c9c174ab23dc11093ac919054d20a6a7fc"
-"checksum wasm-bindgen 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)" = "b0271974d38e09a1e102d95a34a6b27a104ee77541c0314be7e91e026bff9e89"
-"checksum wasm-bindgen-backend 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)" = "8e9a4a55017ec67b697893292efd05eb5f7e0ae26ddb4d9879eee6d60e66eb2b"
-"checksum wasm-bindgen-macro 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)" = "87e37cc5c09b0b58897ea69be6f81d1effb7ab22b34eb48626267471d8c4ec9e"
-"checksum wasm-bindgen-shared 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)" = "a629526dde66833247cfeb5fa2d5ea88f116cb05146f5039f6085784fdea679b"
+"checksum wasm-bindgen 0.2.9 (registry+https://github.com/rust-lang/crates.io-index)" = "3b4beefd775d19064118a959293b130e560aaea471614e4f069c257990438887"
+"checksum wasm-bindgen-backend 0.2.9 (registry+https://github.com/rust-lang/crates.io-index)" = "a69062a2779934857f26b7437b31cdfdae724118630dad372c7c5b2fbdb0c2a5"
+"checksum wasm-bindgen-macro 0.2.9 (registry+https://github.com/rust-lang/crates.io-index)" = "1989fa7432bcd4f402bdf309cb683a68fd25b662fb25f7c24fda2e8cf4215e90"
+"checksum wasm-bindgen-shared 0.2.9 (registry+https://github.com/rust-lang/crates.io-index)" = "f4b014a6660479a3362b67abfdabf4ef6ef3c4b701da6033fe67cf6cebea7729"
