@@ -1,6 +1,4 @@
 .nyc_output/
 target/
 node_modules/
-deadstones.js
-deadstones_bg.js
-deadstones_bg.wasm
+wasm/

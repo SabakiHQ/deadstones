@@ -10,10 +10,10 @@ Use npm to install:
 $ npm install @sabaki/deadstones
 ~~~
 
-Then require it as follows:
+This module loads asynchronously, please require it as follows:
 
 ~~~js
-const deadstones = require('@sabaki/deadstones');
+const deadstones = await require('@sabaki/deadstones');
 ~~~
 
 ## Building

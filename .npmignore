@@ -2,3 +2,5 @@
 target/
 node_modules/
 *.rs
+wasm/deadstones.js
+wasm/deadstones_bg.js
