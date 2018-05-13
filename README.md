@@ -16,6 +16,28 @@ Then require it as follows:
 const deadstones = require('@sabaki/deadstones');
 ~~~
 
+## Building
+
+Make sure you have the Rust toolchain installed via `rustup`. This project uses nightly Rust and the native WASM target which you can acquire with:
+
+~~~
+$ rustup default nightly
+$ rustup target add wasm32-unknown-unknown
+~~~
+
+This project uses [`wasm-bindgen`](https://github.com/rustwasm/wasm-bindgen) which you can install via Cargo:
+
+~~~
+$ cargo install wasm-bindgen-cli
+~~~
+
+To build WASM binaries and to start tests, use the following commands:
+
+~~~
+$ npm run build
+$ npm test
+~~~
+
 ## API
 
 ### Board Data
@@ -67,7 +89,7 @@ Returns an array of arrays of the same size as `data`. Each entry is a number be
 - `data` - [Board data](#board-data)
 - `sign` `-1` | `1` - White player corresponds to `-1`, black player is represented by `1`.
 
-Makes random alternating moves, starting with the player determined by sign, until only eye destroying moves can be made. Then all eyes that are left will be filled with the corresponding color. This final board arrangement data will be returned.
+Makes random alternating moves, starting with the player determined by sign, until only eye filling moves can be made. Then all eyes that are left will be filled with the corresponding color. This final board arrangement data will be returned.
 
 ### `deadstones.getFloatingStones(data)`
 
