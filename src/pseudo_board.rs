@@ -4,20 +4,10 @@ pub type Vertex = usize;
 #[derive(Clone)]
 pub struct PseudoBoard {
     pub data: Vec<Sign>,
-    pub width: usize,
-    pub height: usize
+    pub width: usize
 }
 
 impl PseudoBoard {
-    pub fn new(data: Vec<Sign>, width: usize) -> PseudoBoard {
-        let height = match data.len().checked_div(width) {
-            Some(x) => x,
-            None => 0
-        };
-
-        PseudoBoard {data, width, height}
-    }
-
     pub fn get(&self, v: Vertex) -> Option<Sign> {
         self.data.get(v).cloned()
     }
