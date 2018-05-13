@@ -114,9 +114,9 @@ const make = wasm => {
         return realRet;
     };
 
-    const TextDecoder2 = typeof TextDecoder === 'undefined' ? require('util').TextDecoder : TextDecoder;
+    const TextDecoder = require('util').TextDecoder;
 
-    let cachedDecoder = new TextDecoder2('utf-8');
+    let cachedDecoder = new TextDecoder('utf-8');
 
     function getStringFromWasm(ptr, len) {
         return cachedDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));
@@ -129,10 +129,13 @@ const make = wasm => {
     return result
 }
 
-module.exports = Promise.resolve().then(() => {
-    const {join} = require('path');
-    const {readFileSync} = require('fs');
-    const buffer = readFileSync(join(__dirname, '..', 'wasm', 'deadstones_bg.wasm'));
+module.exports = new Promise((resolve, reject) => {
+    const {join} = require('path')
+    const {readFile} = require('fs')
+    
+    readFile(join(__dirname, '..', 'wasm', 'deadstones_bg.wasm'), (err, buffer) => {
+        if (err) return reject(err)
 
-    return WebAssembly.instantiate(buffer, {'./deadstones': make()});
+        resolve(WebAssembly.instantiate(buffer, {'./deadstones': make()}))
+    })
 }).then(module => make(module.instance.exports))
