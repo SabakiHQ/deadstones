@@ -10,10 +10,10 @@ Use npm to install:
 $ npm install @sabaki/deadstones
 ~~~
 
-This module loads asynchronously, please require it as follows:
+To use this module, require it as follows:
 
 ~~~js
-const deadstones = await require('@sabaki/deadstones');
+const deadstones = require('@sabaki/deadstones');
 ~~~
 
 ## Building
@@ -64,7 +64,7 @@ Board positions are represented by an array of the form `[x, y]` where `x` and `
 
 This module exposes four functions:
 
-### `deadstones.guess(data[, options])`
+### `async deadstones.guess(data[, options])`
 
 - `data` - [Board data](#board-data)
 - `options` `<Object>` *(optional)*
@@ -77,21 +77,21 @@ This module exposes four functions:
 
 Returns an array of vertices that Sabaki thinks are dead.
 
-### `deadstones.getProbabilityMap(data, iterations)`
+### `async deadstones.getProbabilityMap(data, iterations)`
 
 - `data` - [Board data](#board-data)
 - `iterations` `<integer>` - The number of random playthroughs to make.
 
 Returns an array of arrays of the same size as `data`. Each entry is a number between `-1` and `1` and corresponds to a vertex. A number closer to `-1` is more likely controlled by white and a number closer to `1` is more likely controlled by black.
 
-### `deadstones.playTillEnd(data, sign)`
+### `async deadstones.playTillEnd(data, sign)`
 
 - `data` - [Board data](#board-data)
 - `sign` `-1` | `1` - White player corresponds to `-1`, black player is represented by `1`.
 
 Makes random alternating moves, starting with the player determined by sign, until only eye filling moves can be made. Then all eyes that are left will be filled with the corresponding color. This final board arrangement data will be returned.
 
-### `deadstones.getFloatingStones(data)`
+### `async deadstones.getFloatingStones(data)`
 
 - `data` - [Board data](#board-data)
 

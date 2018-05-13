@@ -1,3 +1,5 @@
+const wasm = require('./wasm')
+
 const parseBoard = data => [
     data.reduce((acc, x) => (acc.push(...x), acc), []),
     data.length > 0 ? data[0].length : 0
@@ -14,32 +16,30 @@ const parseGrid = (values, width) => {
         .map((_, y) => values.slice(y * width, (y + 1) * width))
 }
 
-module.exports = require('./wasm').then(lib => ({
-    guess: function(data, {finished = false, iterations = 100} = {}) {
-        let [newData, width] = parseBoard(data)
-        let indices = lib.guess(newData, width, finished, iterations, Date.now())
+exports.guess = async function(data, {finished = false, iterations = 100} = {}) {
+    let [newData, width] = parseBoard(data)
+    let indices = (await wasm).guess(newData, width, finished, iterations, Date.now())
 
-        return parseVertices(indices, width)
-    },
+    return parseVertices(indices, width)
+},
 
-    playTillEnd: function(data, sign) {
-        let [newData, width] = parseBoard(data)
-        let values = lib.play_till_end(newData, width, sign, Date.now())
+exports.playTillEnd = async function(data, sign) {
+    let [newData, width] = parseBoard(data)
+    let values = (await wasm).play_till_end(newData, width, sign, Date.now())
 
-        return parseGrid(values, width)
-    },
+    return parseGrid(values, width)
+},
 
-    getProbabilityMap: function(data, iterations) {
-        let [newData, width] = parseBoard(data)
-        let values = lib.get_probability_map(newData, width, iterations, Date.now())
+exports.getProbabilityMap = async function(data, iterations) {
+    let [newData, width] = parseBoard(data)
+    let values = (await wasm).get_probability_map(newData, width, iterations, Date.now())
 
-        return parseGrid(values, width)
-    },
+    return parseGrid(values, width)
+},
 
-    getFloatingStones: function(data) {
-        let [newData, width] = parseBoard(data)
-        let indices = lib.get_floating_stones(newData, width)
+exports.getFloatingStones = async function(data) {
+    let [newData, width] = parseBoard(data)
+    let indices = (await wasm).get_floating_stones(newData, width)
 
-        return parseVertices(indices, width)
-    }
-}))
+    return parseVertices(indices, width)
+}
