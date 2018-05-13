@@ -2,7 +2,7 @@
   "name": "@sabaki/deadstones",
   "version": "2.0.0",
   "description": "Simple Monte Carlo functions to determine dead stones on a Go board.",
-  "main": "./src/main.js",
+  "main": "./nodejs/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SabakiHQ/deadstones.git"
@@ -24,17 +24,19 @@
   "homepage": "https://github.com/SabakiHQ/deadstones",
   "scripts": {
     "compile": "cargo build --target wasm32-unknown-unknown --release",
-    "pack": "mkdirp ./wasm && wasm-bindgen ./target/wasm32-unknown-unknown/release/deadstones.wasm --out-dir ./wasm --no-typescript --nodejs",
-    "snip": "wasm-snip --snip-rust-fmt-code --snip-rust-panicking-code ./wasm/deadstones_bg.wasm -o ./wasm/deadstones_bg.wasm",
+    "pack:nodejs": "wasm-bindgen ./target/wasm32-unknown-unknown/release/deadstones.wasm --out-dir ./nodejs --no-typescript --nodejs",
+    "pack:webpack": "wasm-bindgen ./target/wasm32-unknown-unknown/release/deadstones.wasm --out-dir ./webpack --no-typescript",
+    "pack": "npm run pack:nodejs && npm run pack:webpack",
     "build": "npm run compile && npm run pack",
+    "snip": "wasm-snip --snip-rust-fmt-code --snip-rust-panicking-code ./nodejs/deadstones_bg.wasm -o ./nodejs/deadstones_bg.wasm && wasm-snip --snip-rust-fmt-code --snip-rust-panicking-code ./webpack/deadstones_bg.wasm -o ./webpack/deadstones_bg.wasm ",
     "prepublishOnly": "npm run build && npm run snip",
     "test": "tap tests/*.test.js"
   },
   "files": [
-    "wasm"
+    "nodejs",
+    "webpack"
   ],
   "devDependencies": {
-    "mkdirp": "^0.5.1",
     "tap": "^11.1.5"
   }
 }
