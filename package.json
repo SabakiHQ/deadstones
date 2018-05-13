@@ -1,6 +1,6 @@
 {
   "name": "@sabaki/deadstones",
-  "version": "2.0.0-beta",
+  "version": "2.0.0-beta2",
   "description": "Simple Monte Carlo functions to determine dead stones on a Go board.",
   "main": "./nodejs/index.js",
   "repository": {
@@ -32,10 +32,6 @@
     "prepublishOnly": "npm run build && npm run snip",
     "test": "tap tests/*.test.js"
   },
-  "files": [
-    "nodejs",
-    "webpack"
-  ],
   "devDependencies": {
     "tap": "^11.1.5"
   }
