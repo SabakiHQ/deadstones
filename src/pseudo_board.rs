@@ -167,7 +167,7 @@ impl PseudoBoard {
             dead.append(&mut chain);
         }
 
-        if check_multi_dead_chains && dead_chains <= 1 
+        if check_multi_dead_chains && dead_chains <= 1
         || check_capture && dead.len() == 0 {
             for &d in &dead {
                 self.set(d, -sign);
@@ -189,16 +189,16 @@ impl PseudoBoard {
                 continue;
             }
 
-            let pos_area = self.get_connected_component(vertex, &vec![0, -1]);
-            let neg_area = self.get_connected_component(vertex, &vec![0, 1]);
+            let pos_area = self.get_connected_component(vertex, &[0, -1]);
+            let neg_area = self.get_connected_component(vertex, &[0, 1]);
             let pos_dead = pos_area.iter().cloned()
                 .filter(|&v| self.get(v) == Some(-1)).collect::<Vec<_>>();
             let neg_dead = neg_area.iter().cloned()
                 .filter(|&v| self.get(v) == Some(1)).collect::<Vec<_>>();
-            let pos_diff = pos_area.iter().cloned()
-                .filter(|v| !pos_dead.contains(v) && !neg_area.contains(v)).count();
-            let neg_diff = neg_area.iter().cloned()
-                .filter(|v| !neg_dead.contains(v) && !pos_area.contains(v)).count();
+            let pos_diff = pos_area.iter()
+                .filter(|&v| !pos_dead.contains(v) && !neg_area.contains(v)).count();
+            let neg_diff = neg_area.iter()
+                .filter(|&v| !neg_dead.contains(v) && !pos_area.contains(v)).count();
 
             let favor_neg = neg_diff <= 1 && neg_dead.len() <= pos_dead.len();
             let favor_pos = pos_diff <= 1 && pos_dead.len() <= neg_dead.len();
