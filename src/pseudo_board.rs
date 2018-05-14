@@ -20,12 +20,13 @@ impl PseudoBoard {
 
     pub fn get_neighbors(&self, v: Vertex) -> Vec<Vertex> {
         let mut result = vec![v - self.width, v + self.width];
+        let x = v % self.width;
 
-        if v % self.width > 0 {
+        if x > 0 {
             result.push(v - 1);
         }
 
-        if v % self.width < self.width - 1 {
+        if x < self.width - 1 {
             result.push(v + 1);
         }
 
@@ -91,20 +92,16 @@ impl PseudoBoard {
         mut visited: Vec<Vertex>,
         sign: Sign
     ) -> (Vec<Vertex>, bool) {
-        let mut friendly_neighbors = vec![];
+        let neighbors = self.get_neighbors(vertex);
 
-        for neighbor in self.get_neighbors(vertex).into_iter() {
-            match self.get(neighbor) {
-                Some(0) => return (visited, true),
-                Some(s) if s == sign => friendly_neighbors.push(neighbor),
-                _ => ()
-            };
+        if neighbors.iter().any(|&v| self.get(v) == Some(0)) {
+            return (visited, true);
         }
 
         visited.push(vertex);
 
-        for neighbor in friendly_neighbors.into_iter() {
-            if visited.contains(&neighbor) {
+        for neighbor in neighbors.into_iter() {
+            if self.get(neighbor) != Some(sign) || visited.contains(&neighbor) {
                 continue;
             }
 
