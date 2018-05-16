@@ -129,21 +129,19 @@ const make = wasm => {
     return result
 }
 
+let importObj = {'./deadstones': make()}
+
 module.exports = exports = new Promise((resolve, reject) => {
-    let importObj = {'./deadstones': make()}
+    const {join} = require('path')
+    const {readFile} = require('fs')
+    
+    readFile(join(__dirname, '..', 'wasm', 'deadstones_bg.wasm'), (err, buffer) => {
+        if (err) return reject(err)
 
-    if (exports.fetchPath == null) {
-        const {join} = require('path')
-        const {readFile} = require('fs')
-        
-        readFile(join(__dirname, '..', 'wasm', 'deadstones_bg.wasm'), (err, buffer) => {
-            if (err) return reject(err)
-
-            resolve(WebAssembly.instantiate(buffer, importObj))
-        })
-    } else {
-        resolve(WebAssembly.instantiateStreaming(fetch(exports.fetchPath), importObj))
-    }
-}).then(module => make(module.instance.exports))
+        resolve(WebAssembly.instantiate(buffer, importObj))
+    })
+}).catch(() =>
+    WebAssembly.instantiateStreaming(fetch(exports.fetchPath), importObj)
+).then(module => make(module.instance.exports))
 
 exports.fetchPath = null
