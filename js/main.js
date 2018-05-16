@@ -16,6 +16,10 @@ const parseGrid = (values, width) => {
         .map((_, y) => values.slice(y * width, (y + 1) * width))
 }
 
+exports.useFetch = function(path) {
+    wasm.fetchPath = path
+}
+
 exports.guess = async function(data, {finished = false, iterations = 100} = {}) {
     let [newData, width] = parseBoard(data)
     let indices = (await wasm).guess(newData, width, finished, iterations, Date.now())

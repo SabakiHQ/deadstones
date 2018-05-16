@@ -129,10 +129,10 @@ const make = wasm => {
     return result
 }
 
-module.exports = new Promise((resolve, reject) => {
+module.exports = exports = new Promise((resolve, reject) => {
     let importObj = {'./deadstones': make()}
 
-    if (module.exports.wasmPath == null) {
+    if (exports.fetchPath == null) {
         const {join} = require('path')
         const {readFile} = require('fs')
         
@@ -142,8 +142,8 @@ module.exports = new Promise((resolve, reject) => {
             resolve(WebAssembly.instantiate(buffer, importObj))
         })
     } else {
-        let path = module.exports.wasmPath
-
-        resolve(WebAssembly.instantiateStreaming(fetch(path), importObj))
+        resolve(WebAssembly.instantiateStreaming(fetch(exports.fetchPath), importObj))
     }
 }).then(module => make(module.instance.exports))
+
+exports.fetchPath = null
