@@ -132,7 +132,7 @@ const make = wasm => {
 module.exports = new Promise((resolve, reject) => {
     let importObj = {'./deadstones': make()}
 
-    if (typeof require !== 'undefined') {
+    if (module.exports.wasmPath == null) {
         const {join} = require('path')
         const {readFile} = require('fs')
         
