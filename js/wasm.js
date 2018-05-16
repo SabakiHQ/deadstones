@@ -141,7 +141,9 @@ module.exports = exports = new Promise((resolve, reject) => {
         resolve(WebAssembly.instantiate(buffer, importObj))
     })
 }).catch(() =>
-    WebAssembly.instantiateStreaming(fetch(exports.fetchPath), importObj)
+    fetch(exports.fetchPath)
+    .then(response => response.arrayBuffer())
+    .then(buffer => WebAssembly.instantiate(buffer, importObj))
 ).then(module => make(module.instance.exports))
 
 exports.fetchPath = null
