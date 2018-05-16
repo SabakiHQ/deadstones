@@ -13,7 +13,13 @@ $ npm install @sabaki/deadstones
 To use this module, require it as follows:
 
 ~~~js
-const deadstones = require('@sabaki/deadstones');
+const deadstones = require('@sabaki/deadstones')
+~~~
+
+This module supports fetching the WASM file via `fetch` on the web if no node environment is found. Use a bundler like webpack and call the following method right after `import` or `require`:
+
+~~~js
+deadstones.useFetch('./path/to/deadstones_bg.wasm')
 ~~~
 
 ## Building
