@@ -66,7 +66,7 @@ The board arrangement is represented by an array of arrays. Each of those subarr
 
 ### Vertex
 
-Board positions are represented by an array of the form `[x, y]` where `x` and `y` are positive integers, zero-based coordinates of the vertex. `[0, 0]` denotes the top left position of the board.
+Board positions are represented by an array of the form `[x, y]` where `x` and `y` are non-negative integers, zero-based coordinates of the vertex. `[0, 0]` denotes the top left position of the board.
 
 This module exposes four functions:
 
