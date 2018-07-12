@@ -37,6 +37,14 @@ This project uses [`wasm-bindgen`](https://github.com/rustwasm/wasm-bindgen) whi
 $ cargo install wasm-bindgen-cli
 ~~~
 
+Make sure you have Node.js 8 or higher and npm installed. Clone this repository and install its dependencies with npm:
+
+~~~sh
+$ git clone https://github.com/SabakiHQ/deadstones
+$ cd deadstones
+$ npm install
+~~~
+
 To build WASM binaries and to start tests, use the following commands:
 
 ~~~
