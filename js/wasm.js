@@ -49,7 +49,7 @@ const make = wasm => {
         const mem = getUint32Memory();
         const ptr = mem[retptr / 4];
         const len = mem[retptr / 4 + 1];
-        const realRet = getArrayU32FromWasm(ptr, len);
+        const realRet = getArrayU32FromWasm(ptr, len).slice();
         wasm.__wbindgen_free(ptr, len * 4);
         return realRet;
     };
@@ -73,7 +73,7 @@ const make = wasm => {
         const mem = getUint32Memory();
         const ptr = mem[retptr / 4];
         const len = mem[retptr / 4 + 1];
-        const realRet = getArrayF32FromWasm(ptr, len);
+        const realRet = getArrayF32FromWasm(ptr, len).slice();
         wasm.__wbindgen_free(ptr, len * 4);
         return realRet;
     };
@@ -97,7 +97,7 @@ const make = wasm => {
         const mem = getUint32Memory();
         const ptr = mem[retptr / 4];
         const len = mem[retptr / 4 + 1];
-        const realRet = getArrayI8FromWasm(ptr, len);
+        const realRet = getArrayI8FromWasm(ptr, len).slice();
         wasm.__wbindgen_free(ptr, len * 1);
         return realRet;
     };
@@ -109,7 +109,7 @@ const make = wasm => {
         const mem = getUint32Memory();
         const ptr = mem[retptr / 4];
         const len = mem[retptr / 4 + 1];
-        const realRet = getArrayU32FromWasm(ptr, len);
+        const realRet = getArrayU32FromWasm(ptr, len).slice();
         wasm.__wbindgen_free(ptr, len * 4);
         return realRet;
     };
@@ -134,7 +134,7 @@ let importObj = {'./deadstones': make()}
 module.exports = exports = new Promise((resolve, reject) => {
     const {join} = require('path')
     const {readFile} = require('fs')
-    
+
     readFile(join(__dirname, '..', 'wasm', 'deadstones_bg.wasm'), (err, buffer) => {
         if (err) return reject(err)
 
