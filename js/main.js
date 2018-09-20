@@ -18,6 +18,8 @@ const parseGrid = (values, width) => {
 
 exports.useFetch = function(path) {
     wasm.fetchPath = path
+
+    return exports
 }
 
 exports.guess = async function(data, {finished = false, iterations = 100} = {}) {
