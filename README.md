@@ -27,14 +27,13 @@ deadstones.useFetch('./path/to/deadstones_bg.wasm')
 Make sure you have the Rust toolchain installed via `rustup`. This project uses nightly Rust and the native WASM target which you can acquire with:
 
 ~~~
-$ rustup default nightly
 $ rustup target add wasm32-unknown-unknown
 ~~~
 
 This project uses [`wasm-bindgen`](https://github.com/rustwasm/wasm-bindgen) which you can install via Cargo:
 
 ~~~
-$ cargo install -f wasm-bindgen-cli
+$ cargo +nightly install -f wasm-bindgen-cli
 ~~~
 
 Make sure you have Node.js 8 or higher and npm installed. Clone this repository and install its dependencies with npm:
