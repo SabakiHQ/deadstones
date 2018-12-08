@@ -12,10 +12,13 @@ const make = wasm => {
         return cachegetUint8Memory;
     }
 
+    let WASM_VECTOR_LEN = 0;
+
     function passArray8ToWasm(arg) {
         const ptr = wasm.__wbindgen_malloc(arg.length * 1);
         getUint8Memory().set(arg, ptr / 1);
-        return [ptr, arg.length];
+        WASM_VECTOR_LEN = arg.length;
+        return ptr;
     }
 
     let cachegetUint32Memory = null;
@@ -46,9 +49,10 @@ const make = wasm => {
     * @returns {Uint32Array}
     */
     result.guess = function(arg0, arg1, arg2, arg3, arg4) {
-        const [ptr0, len0] = passArray8ToWasm(arg0);
+        const ptr0 = passArray8ToWasm(arg0);
+        const len0 = WASM_VECTOR_LEN;
         const retptr = globalArgumentPtr();
-        wasm.guess(retptr, ptr0, len0, arg1, arg2 ? 1 : 0, arg3, arg4);
+        wasm.guess(retptr, ptr0, len0, arg1, arg2, arg3, arg4);
         const mem = getUint32Memory();
         const rustptr = mem[retptr / 4];
         const rustlen = mem[retptr / 4 + 1];
@@ -78,7 +82,8 @@ const make = wasm => {
     * @returns {Float32Array}
     */
     result.get_probability_map = function(arg0, arg1, arg2, arg3) {
-        const [ptr0, len0] = passArray8ToWasm(arg0);
+        const ptr0 = passArray8ToWasm(arg0);
+        const len0 = WASM_VECTOR_LEN;
         const retptr = globalArgumentPtr();
         wasm.get_probability_map(retptr, ptr0, len0, arg1, arg2, arg3);
         const mem = getUint32Memory();
@@ -110,7 +115,8 @@ const make = wasm => {
     * @returns {Int8Array}
     */
     result.play_till_end = function(arg0, arg1, arg2, arg3) {
-        const [ptr0, len0] = passArray8ToWasm(arg0);
+        const ptr0 = passArray8ToWasm(arg0);
+        const len0 = WASM_VECTOR_LEN;
         const retptr = globalArgumentPtr();
         wasm.play_till_end(retptr, ptr0, len0, arg1, arg2, arg3);
         const mem = getUint32Memory();
@@ -129,7 +135,8 @@ const make = wasm => {
     * @returns {Uint32Array}
     */
     result.get_floating_stones = function(arg0, arg1) {
-        const [ptr0, len0] = passArray8ToWasm(arg0);
+        const ptr0 = passArray8ToWasm(arg0);
+        const len0 = WASM_VECTOR_LEN;
         const retptr = globalArgumentPtr();
         wasm.get_floating_stones(retptr, ptr0, len0, arg1);
         const mem = getUint32Memory();
@@ -140,18 +147,6 @@ const make = wasm => {
         wasm.__wbindgen_free(rustptr, rustlen * 4);
         return realRet;
 
-    };
-
-    const TextDecoder = require('util').TextDecoder;
-
-    let cachedDecoder = new TextDecoder('utf-8');
-
-    function getStringFromWasm(ptr, len) {
-        return cachedDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));
-    }
-
-    result.__wbindgen_throw = function(ptr, len) {
-        throw new Error(getStringFromWasm(ptr, len));
     };
 
     return result
