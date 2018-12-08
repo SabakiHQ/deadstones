@@ -92,23 +92,19 @@ impl PseudoBoard {
         mut visited: Vec<Vertex>,
         sign: Sign
     ) -> (Vec<Vertex>, bool) {
-        let neighbors = self.get_neighbors(vertex);
-
-        if neighbors.iter().any(|&v| self.get(v) == Some(0)) {
-            return (visited, true);
-        }
-
         visited.push(vertex);
 
-        for neighbor in neighbors.into_iter() {
-            if self.get(neighbor) != Some(sign) || visited.contains(&neighbor) {
-                continue;
+        for neighbor in self.get_neighbors(vertex).into_iter() {
+            match self.get(neighbor) {
+                Some(0) => return (visited, true),
+                Some(x) if x == sign && !visited.contains(&neighbor) => {
+                    visited = match self.has_liberties_inner(neighbor, visited, sign) {
+                        (x, true) => return (x, true),
+                        (x, false) => x
+                    };
+                },
+                _ => {}
             }
-
-            visited = match self.has_liberties_inner(neighbor, visited, sign) {
-                (x, true) => return (x, true),
-                (x, false) => x
-            };
         }
 
         (visited, false)
