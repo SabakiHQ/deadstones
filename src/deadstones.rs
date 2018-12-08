@@ -16,26 +16,29 @@ pub fn guess(mut board: PseudoBoard, finished: bool, iterations: usize, rand: &m
         false => vec![]
     };
 
-    let map = get_probability_map(board.clone(), iterations, rand);
+    let map = get_probability_map(&board, iterations, rand);
     let mut done = vec![];
 
     for vertex in 0..map.len() {
         let sign = match board.get(vertex) {
-            Some(0) => continue,
-            Some(x) if !done.contains(&vertex) => x,
+            Some(x) if x != 0 && !done.contains(&vertex) => x,
             _ => continue
         };
 
-        let mut chain = board.get_chain(vertex);
+        let chain = board.get_chain(vertex);
         let probability = chain.iter()
             .filter_map(|&v| map.get(v).cloned())
             .sum::<f32>() / chain.len() as f32;
 
-        if probability.signum() as Sign == -sign {
-            result.append(&mut chain.clone());
-        }
+        let dead = probability.signum() as Sign == -sign;
 
-        done.append(&mut chain);
+        for c in chain.into_iter() {
+            if dead {
+                result.push(c);
+            }
+
+            done.push(c);
+        }
     }
 
     if !finished {
@@ -52,23 +55,27 @@ pub fn guess(mut board: PseudoBoard, finished: bool, iterations: usize, rand: &m
             continue;
         }
 
-        let mut related = board.get_related_chains(vertex);
+        let related = board.get_related_chains(vertex);
         let dead_probability = related.iter()
             .filter(|&v| result.contains(v))
             .count() as f32
             / related.len() as f32;
 
-        if dead_probability > 0.5 {
-            updated_result.append(&mut related.clone());
-        }
+        let dead = dead_probability > 0.5;
 
-        done.append(&mut related);
+        for v in related.into_iter() {
+            if dead {
+                updated_result.push(v);
+            }
+
+            done.push(v);
+        }
     }
 
     updated_result
 }
 
-pub fn get_probability_map(board: PseudoBoard, iterations: usize, rand: &mut Rand) -> Vec<f32> {
+pub fn get_probability_map(board: &PseudoBoard, iterations: usize, rand: &mut Rand) -> Vec<f32> {
     let mut result = board.data.iter().map(|_| (0, 0)).collect::<Vec<_>>();
 
     for i in 0..iterations {
@@ -81,7 +88,7 @@ pub fn get_probability_map(board: PseudoBoard, iterations: usize, rand: &mut Ran
                 None => continue
             };
 
-            if let Some(mut slots) = result.get_mut(v) {
+            if let Some(slots) = result.get_mut(v) {
                 if s == -1 {
                     slots.0 += 1;
                 } else if s == 1 {

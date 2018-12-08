@@ -22,7 +22,7 @@ pub fn guess(data: Vec<Sign>, width: usize, finished: bool, iterations: usize, s
 pub fn get_probability_map(data: Vec<Sign>, width: usize, iterations: usize, seed: u32) -> Vec<f32> {
     let board = PseudoBoard {data, width};
 
-    deadstones::get_probability_map(board, iterations, &mut Rand::new(seed))
+    deadstones::get_probability_map(&board, iterations, &mut Rand::new(seed))
 }
 
 #[wasm_bindgen]

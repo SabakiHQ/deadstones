@@ -33,19 +33,14 @@ impl PseudoBoard {
         result
     }
 
-    pub fn is_point_chain(&self, v: Vertex) -> bool {
-        let sign = self.get(v);
-
-        self.get_neighbors(v).into_iter()
-        .all(|n| self.get(n) != sign)
-    }
-
     fn get_connected_component_inner(
         &self,
         vertex: Vertex,
         signs: &[Sign],
-        mut result: Vec<Vertex>
-    ) -> Vec<Vertex> {
+        result: &mut Vec<Vertex>
+    ) {
+        result.push(vertex);
+
         for neighbor in self.get_neighbors(vertex).into_iter() {
             let s = match self.get(neighbor) {
                 Some(x) => x,
@@ -53,16 +48,15 @@ impl PseudoBoard {
             };
 
             if signs.contains(&s) && !result.contains(&neighbor) {
-                result.push(neighbor);
-                result = self.get_connected_component_inner(neighbor, signs, result);
+                self.get_connected_component_inner(neighbor, signs, result);
             }
         }
-
-        result
     }
 
     pub fn get_connected_component(&self, vertex: Vertex, signs: &[Sign]) -> Vec<Vertex> {
-        self.get_connected_component_inner(vertex, signs, vec![vertex])
+        let mut result = vec![];
+        self.get_connected_component_inner(vertex, signs, &mut result);
+        result
     }
 
     pub fn get_related_chains(&self, vertex: Vertex) -> Vec<Vertex> {
@@ -89,32 +83,31 @@ impl PseudoBoard {
     fn has_liberties_inner(
         &self,
         vertex: Vertex,
-        mut visited: Vec<Vertex>,
+        visited: &mut Vec<Vertex>,
         sign: Sign
-    ) -> (Vec<Vertex>, bool) {
+    ) -> bool {
         visited.push(vertex);
 
         for neighbor in self.get_neighbors(vertex).into_iter() {
             match self.get(neighbor) {
-                Some(0) => return (visited, true),
+                Some(0) => return true,
                 Some(x) if x == sign && !visited.contains(&neighbor) => {
-                    visited = match self.has_liberties_inner(neighbor, visited, sign) {
-                        (x, true) => return (x, true),
-                        (x, false) => x
-                    };
+                    if self.has_liberties_inner(neighbor, visited, sign) {
+                        return true;
+                    }
                 },
                 _ => {}
             }
         }
 
-        (visited, false)
+        false
     }
 
     pub fn has_liberties(&self, vertex: Vertex) -> bool {
-        self.has_liberties_inner(vertex, vec![], match self.get(vertex) {
+        self.has_liberties_inner(vertex, &mut vec![], match self.get(vertex) {
             Some(x) => x,
             None => return false
-        }).1
+        })
     }
 
     pub fn make_pseudo_move(&mut self, sign: Sign, vertex: Vertex) -> Option<Vec<Vertex>> {
@@ -135,7 +128,10 @@ impl PseudoBoard {
         self.set(vertex, sign);
 
         if !self.has_liberties(vertex) {
-            if self.is_point_chain(vertex) {
+            let is_point_chain = neighbors.iter()
+                .all(|&n| self.get(n) != Some(sign));
+
+            if is_point_chain {
                 check_multi_dead_chains = true;
             } else {
                 check_capture = true;
