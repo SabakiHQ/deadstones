@@ -2,7 +2,6 @@ use rand::Rand;
 use pseudo_board::*;
 
 pub fn guess(mut board: PseudoBoard, finished: bool, iterations: usize, rand: &mut Rand) -> Vec<Vertex> {
-    let mut result = vec![];
     let floating = match finished {
         true => {
             let floating = board.get_floating_stones();
@@ -17,6 +16,7 @@ pub fn guess(mut board: PseudoBoard, finished: bool, iterations: usize, rand: &m
     };
 
     let map = get_probability_map(&board, iterations, rand);
+    let mut result = vec![];
     let mut done = vec![];
 
     for vertex in 0..map.len() {

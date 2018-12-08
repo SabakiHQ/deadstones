@@ -116,11 +116,8 @@ impl PseudoBoard {
         let mut check_multi_dead_chains = false;
 
         if neighbors.iter().all(|&neighbor| {
-            match self.get(neighbor) {
-                None => true,
-                Some(s) if s == sign => true,
-                _ => false
-            }
+            let s = self.get(neighbor);
+            s == None || s == Some(sign)
         }) {
             return None;
         }
@@ -146,14 +143,13 @@ impl PseudoBoard {
                 continue;
             }
 
-            let mut chain = self.get_chain(neighbor);
+            let chain = self.get_chain(neighbor);
             dead_chains += 1;
 
-            for &c in &chain {
+            for c in chain.into_iter() {
                 self.set(c, 0);
+                dead.push(c);
             }
-
-            dead.append(&mut chain);
         }
 
         if check_multi_dead_chains && dead_chains <= 1
