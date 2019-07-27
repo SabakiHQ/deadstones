@@ -23,9 +23,7 @@
   },
   "homepage": "https://github.com/SabakiHQ/deadstones",
   "scripts": {
-    "compile": "cargo +nightly build --target wasm32-unknown-unknown --release",
-    "pack": "mkdirp ./wasm && wasm-bindgen ./target/wasm32-unknown-unknown/release/deadstones.wasm --out-dir ./wasm --no-typescript --nodejs",
-    "build": "npm run compile && npm run pack",
+    "build": "wasm-pack build --out-dir ./wasm --target nodejs",
     "snip": "wasm-snip --snip-rust-fmt-code --snip-rust-panicking-code ./wasm/deadstones_bg.wasm -o ./wasm/deadstones_bg.wasm",
     "prepublishOnly": "npm run build && npm run snip",
     "test": "tap tests/*.test.js"

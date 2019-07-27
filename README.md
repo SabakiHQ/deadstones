@@ -24,19 +24,13 @@ deadstones.useFetch('./path/to/deadstones_bg.wasm')
 
 ## Building
 
-Make sure you have the Rust toolchain installed via `rustup`. This project uses nightly Rust and the native WASM target which you can acquire with:
+Make sure you have the Rust toolchain installed via `rustup`. This project uses the native WASM target which you can acquire with:
 
 ~~~
 $ rustup target add wasm32-unknown-unknown
 ~~~
 
-This project uses [`wasm-bindgen`](https://github.com/rustwasm/wasm-bindgen) which you can install via Cargo:
-
-~~~
-$ cargo +nightly install -f wasm-bindgen-cli
-~~~
-
-Make sure you have Node.js 8 or higher and npm installed. Clone this repository and install its dependencies with npm:
+Make sure you have [`wasm-pack`](https://rustwasm.github.io/wasm-pack/), Node.js 8 or higher, and npm installed. Clone this repository and install its dependencies with npm:
 
 ~~~sh
 $ git clone https://github.com/SabakiHQ/deadstones
