@@ -125,19 +125,35 @@ const make = wasm => {
     return result
 }
 
-module.exports = exports = new Promise((resolve, reject) => {
-    const {join} = require('path')
-    const {readFile} = require('fs')
+const imports = {}
 
-    readFile(join(__dirname, '..', 'wasm', 'deadstones_bg.wasm'), (err, buffer) => {
-        if (err) return reject(err)
+module.exports = exports = (async () => {
+    let wasm
 
-        resolve(WebAssembly.instantiate(buffer, {}))
-    })
-}).catch(() =>
-    fetch(exports.fetchPath)
-    .then(response => response.arrayBuffer())
-    .then(buffer => WebAssembly.instantiate(buffer, {}))
-).then(module => make(module.instance.exports))
+    try {
+        const {join} = require('path')
+        const {readFile} = require('fs')
+
+        let buffer = await new Promise((resolve, reject) =>
+            readFile(join(__dirname, '..', 'wasm', 'deadstones_bg.wasm'), (err, buffer) => {
+                if (err) return reject(err)
+                resolve(buffer)
+            })
+        )
+
+        wasm = await WebAssembly.instantiate(buffer, imports)
+    } catch (err) {
+        let response = await fetch(exports.fetchPath)
+
+        try {
+            wasm = await WebAssembly.instantiateStreaming(response, imports)
+        } catch (err) {
+            let buffer = await response.arrayBuffer()
+            wasm = await WebAssembly.instantiate(buffer, imports)
+        }
+    }
+
+    return make(wasm.instance.exports)
+})()
 
 exports.fetchPath = null
