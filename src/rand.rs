@@ -29,6 +29,6 @@ impl Rand {
     pub fn range(&mut self, a: i32, b: i32) -> i32 {
         let m = (b - a) as u32;
 
-        a + (self.rand() % m) as i32
+        a + self.rand().checked_rem(m).unwrap_or(0) as i32
     }
 }
