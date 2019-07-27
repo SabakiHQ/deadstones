@@ -32,21 +32,21 @@ exports.guess = async function(data, {finished = false, iterations = 100} = {}) 
 
 exports.playTillEnd = async function(data, sign) {
     let {newData, width} = parseBoard(data)
-    let values = (await wasm).play_till_end(newData, width, sign, Date.now())
+    let values = (await wasm).playTillEnd(newData, width, sign, Date.now())
 
     return parseGrid(values, width)
 },
 
 exports.getProbabilityMap = async function(data, iterations) {
     let {newData, width} = parseBoard(data)
-    let values = (await wasm).get_probability_map(newData, width, iterations, Date.now())
+    let values = (await wasm).getProbabilityMap(newData, width, iterations, Date.now())
 
     return parseGrid(values, width)
 },
 
 exports.getFloatingStones = async function(data) {
     let {newData, width} = parseBoard(data)
-    let indices = (await wasm).get_floating_stones(newData, width)
+    let indices = (await wasm).getFloatingStones(newData, width)
 
     return parseVertices(indices, width)
 }

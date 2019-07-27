@@ -1,9 +1,6 @@
 const make = wasm => {
     let result = {}
 
-    /* tslint:disable */
-    var wasm;
-
     let cachegetUint8Memory = null;
     function getUint8Memory() {
         if (cachegetUint8Memory === null || cachegetUint8Memory.buffer !== wasm.memory.buffer) {
@@ -21,6 +18,14 @@ const make = wasm => {
         return ptr;
     }
 
+    let cachegetInt32Memory = null;
+    function getInt32Memory() {
+        if (cachegetInt32Memory === null || cachegetInt32Memory.buffer !== wasm.memory.buffer) {
+            cachegetInt32Memory = new Int32Array(wasm.memory.buffer);
+        }
+        return cachegetInt32Memory;
+    }
+
     let cachegetUint32Memory = null;
     function getUint32Memory() {
         if (cachegetUint32Memory === null || cachegetUint32Memory.buffer !== wasm.memory.buffer) {
@@ -32,35 +37,21 @@ const make = wasm => {
     function getArrayU32FromWasm(ptr, len) {
         return getUint32Memory().subarray(ptr / 4, ptr / 4 + len);
     }
-
-    let cachedGlobalArgumentPtr = null;
-    function globalArgumentPtr() {
-        if (cachedGlobalArgumentPtr === null) {
-            cachedGlobalArgumentPtr = wasm.__wbindgen_global_argument_ptr();
-        }
-        return cachedGlobalArgumentPtr;
-    }
     /**
-    * @param {Int8Array} arg0
-    * @param {number} arg1
-    * @param {boolean} arg2
-    * @param {number} arg3
-    * @param {number} arg4
+    * @param {Int8Array} data
+    * @param {number} width
+    * @param {boolean} finished
+    * @param {number} iterations
+    * @param {number} seed
     * @returns {Uint32Array}
     */
-    result.guess = function(arg0, arg1, arg2, arg3, arg4) {
-        const ptr0 = passArray8ToWasm(arg0);
-        const len0 = WASM_VECTOR_LEN;
-        const retptr = globalArgumentPtr();
-        wasm.guess(retptr, ptr0, len0, arg1, arg2, arg3, arg4);
-        const mem = getUint32Memory();
-        const rustptr = mem[retptr / 4];
-        const rustlen = mem[retptr / 4 + 1];
-
-        const realRet = getArrayU32FromWasm(rustptr, rustlen).slice();
-        wasm.__wbindgen_free(rustptr, rustlen * 4);
-        return realRet;
-
+    result.guess = function(data, width, finished, iterations, seed) {
+        const retptr = 8;
+        const ret = wasm.guess(retptr, passArray8ToWasm(data), WASM_VECTOR_LEN, width, finished, iterations, seed);
+        const memi32 = getInt32Memory();
+        const v0 = getArrayU32FromWasm(memi32[retptr / 4 + 0], memi32[retptr / 4 + 1]).slice();
+        wasm.__wbindgen_free(memi32[retptr / 4 + 0], memi32[retptr / 4 + 1] * 4);
+        return v0;
     };
 
     let cachegetFloat32Memory = null;
@@ -75,25 +66,19 @@ const make = wasm => {
         return getFloat32Memory().subarray(ptr / 4, ptr / 4 + len);
     }
     /**
-    * @param {Int8Array} arg0
-    * @param {number} arg1
-    * @param {number} arg2
-    * @param {number} arg3
+    * @param {Int8Array} data
+    * @param {number} width
+    * @param {number} iterations
+    * @param {number} seed
     * @returns {Float32Array}
     */
-    result.get_probability_map = function(arg0, arg1, arg2, arg3) {
-        const ptr0 = passArray8ToWasm(arg0);
-        const len0 = WASM_VECTOR_LEN;
-        const retptr = globalArgumentPtr();
-        wasm.get_probability_map(retptr, ptr0, len0, arg1, arg2, arg3);
-        const mem = getUint32Memory();
-        const rustptr = mem[retptr / 4];
-        const rustlen = mem[retptr / 4 + 1];
-
-        const realRet = getArrayF32FromWasm(rustptr, rustlen).slice();
-        wasm.__wbindgen_free(rustptr, rustlen * 4);
-        return realRet;
-
+    result.getProbabilityMap = function(data, width, iterations, seed) {
+        const retptr = 8;
+        const ret = wasm.getProbabilityMap(retptr, passArray8ToWasm(data), WASM_VECTOR_LEN, width, iterations, seed);
+        const memi32 = getInt32Memory();
+        const v0 = getArrayF32FromWasm(memi32[retptr / 4 + 0], memi32[retptr / 4 + 1]).slice();
+        wasm.__wbindgen_free(memi32[retptr / 4 + 0], memi32[retptr / 4 + 1] * 4);
+        return v0;
     };
 
     let cachegetInt8Memory = null;
@@ -108,51 +93,37 @@ const make = wasm => {
         return getInt8Memory().subarray(ptr / 1, ptr / 1 + len);
     }
     /**
-    * @param {Int8Array} arg0
-    * @param {number} arg1
-    * @param {number} arg2
-    * @param {number} arg3
+    * @param {Int8Array} data
+    * @param {number} width
+    * @param {number} sign
+    * @param {number} seed
     * @returns {Int8Array}
     */
-    result.play_till_end = function(arg0, arg1, arg2, arg3) {
-        const ptr0 = passArray8ToWasm(arg0);
-        const len0 = WASM_VECTOR_LEN;
-        const retptr = globalArgumentPtr();
-        wasm.play_till_end(retptr, ptr0, len0, arg1, arg2, arg3);
-        const mem = getUint32Memory();
-        const rustptr = mem[retptr / 4];
-        const rustlen = mem[retptr / 4 + 1];
-
-        const realRet = getArrayI8FromWasm(rustptr, rustlen).slice();
-        wasm.__wbindgen_free(rustptr, rustlen * 1);
-        return realRet;
-
+    result.playTillEnd = function(data, width, sign, seed) {
+        const retptr = 8;
+        const ret = wasm.playTillEnd(retptr, passArray8ToWasm(data), WASM_VECTOR_LEN, width, sign, seed);
+        const memi32 = getInt32Memory();
+        const v0 = getArrayI8FromWasm(memi32[retptr / 4 + 0], memi32[retptr / 4 + 1]).slice();
+        wasm.__wbindgen_free(memi32[retptr / 4 + 0], memi32[retptr / 4 + 1] * 1);
+        return v0;
     };
 
     /**
-    * @param {Int8Array} arg0
-    * @param {number} arg1
+    * @param {Int8Array} data
+    * @param {number} width
     * @returns {Uint32Array}
     */
-    result.get_floating_stones = function(arg0, arg1) {
-        const ptr0 = passArray8ToWasm(arg0);
-        const len0 = WASM_VECTOR_LEN;
-        const retptr = globalArgumentPtr();
-        wasm.get_floating_stones(retptr, ptr0, len0, arg1);
-        const mem = getUint32Memory();
-        const rustptr = mem[retptr / 4];
-        const rustlen = mem[retptr / 4 + 1];
-
-        const realRet = getArrayU32FromWasm(rustptr, rustlen).slice();
-        wasm.__wbindgen_free(rustptr, rustlen * 4);
-        return realRet;
-
+    result.getFloatingStones = function(data, width) {
+        const retptr = 8;
+        const ret = wasm.getFloatingStones(retptr, passArray8ToWasm(data), WASM_VECTOR_LEN, width);
+        const memi32 = getInt32Memory();
+        const v0 = getArrayU32FromWasm(memi32[retptr / 4 + 0], memi32[retptr / 4 + 1]).slice();
+        wasm.__wbindgen_free(memi32[retptr / 4 + 0], memi32[retptr / 4 + 1] * 4);
+        return v0;
     };
 
     return result
 }
-
-let importObj = {'./deadstones': make()}
 
 module.exports = exports = new Promise((resolve, reject) => {
     const {join} = require('path')
@@ -161,12 +132,12 @@ module.exports = exports = new Promise((resolve, reject) => {
     readFile(join(__dirname, '..', 'wasm', 'deadstones_bg.wasm'), (err, buffer) => {
         if (err) return reject(err)
 
-        resolve(WebAssembly.instantiate(buffer, importObj))
+        resolve(WebAssembly.instantiate(buffer, {}))
     })
 }).catch(() =>
     fetch(exports.fetchPath)
     .then(response => response.arrayBuffer())
-    .then(buffer => WebAssembly.instantiate(buffer, importObj))
+    .then(buffer => WebAssembly.instantiate(buffer, {}))
 ).then(module => make(module.instance.exports))
 
 exports.fetchPath = null

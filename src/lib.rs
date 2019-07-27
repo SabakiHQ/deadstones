@@ -18,21 +18,21 @@ pub fn guess(data: Vec<Sign>, width: usize, finished: bool, iterations: usize, s
     .collect()
 }
 
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = getProbabilityMap)]
 pub fn get_probability_map(data: Vec<Sign>, width: usize, iterations: usize, seed: u32) -> Vec<f32> {
     let board = PseudoBoard {data, width};
 
     deadstones::get_probability_map(&board, iterations, &mut Rand::new(seed))
 }
 
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = playTillEnd)]
 pub fn play_till_end(data: Vec<Sign>, width: usize, sign: Sign, seed: u32) -> Vec<Sign> {
     let board = PseudoBoard {data, width};
 
     deadstones::play_till_end(board, sign, &mut Rand::new(seed)).data
 }
 
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = getFloatingStones)]
 pub fn get_floating_stones(data: Vec<Sign>, width: usize) -> Vec<u32> {
     let board = PseudoBoard {data, width};
 
