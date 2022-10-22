@@ -30,6 +30,6 @@
   },
   "devDependencies": {
     "mkdirp": "^0.5.1",
-    "tap": "^14.4.3"
+    "tap": "^16.0.0"
   }
 }
