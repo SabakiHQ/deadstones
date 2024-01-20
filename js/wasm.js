@@ -101,7 +101,7 @@ const make = wasm => {
     */
     result.playTillEnd = function(data, width, sign, seed) {
         const retptr = 8;
-        const ret = wasm.playTillEnd(retptr, passArray8ToWasm(data), WASM_VECTOR_LEN, width, sign, seed);
+        wasm.playTillEnd(retptr, passArray8ToWasm(data), WASM_VECTOR_LEN, width, sign, seed);
         const memi32 = getInt32Memory();
         const v0 = getArrayI8FromWasm(memi32[retptr / 4 + 0], memi32[retptr / 4 + 1]).slice();
         wasm.__wbindgen_free(memi32[retptr / 4 + 0], memi32[retptr / 4 + 1] * 1);
@@ -115,7 +115,7 @@ const make = wasm => {
     */
     result.getFloatingStones = function(data, width) {
         const retptr = 8;
-        const ret = wasm.getFloatingStones(retptr, passArray8ToWasm(data), WASM_VECTOR_LEN, width);
+        wasm.getFloatingStones(retptr, passArray8ToWasm(data), WASM_VECTOR_LEN, width);
         const memi32 = getInt32Memory();
         const v0 = getArrayU32FromWasm(memi32[retptr / 4 + 0], memi32[retptr / 4 + 1]).slice();
         wasm.__wbindgen_free(memi32[retptr / 4 + 0], memi32[retptr / 4 + 1] * 4);
@@ -127,10 +127,28 @@ const make = wasm => {
 
 const imports = {}
 
-module.exports = exports = (async () => {
-    let wasm
+let wasm
+export const loadWasm= async (fetchPath) => {
 
-    try {
+    //Already loaded
+    if (wasm) {
+        return wasm
+    }
+
+    //Load using fetch
+    if (fetchPath) {
+        const response = await fetch(fetchPath)
+
+        try {
+            wasm = await WebAssembly.instantiateStreaming(response, imports)
+        } catch (err) {
+            const buffer = await response.arrayBuffer()
+            wasm = await WebAssembly.instantiate(buffer, imports)
+        }
+    }
+
+    //Load using local filesystem
+    else {
         const {join} = require('path')
         const {readFile} = require('fs')
 
@@ -142,18 +160,7 @@ module.exports = exports = (async () => {
         )
 
         wasm = await WebAssembly.instantiate(buffer, imports)
-    } catch (err) {
-        let response = await fetch(exports.fetchPath)
-
-        try {
-            wasm = await WebAssembly.instantiateStreaming(response, imports)
-        } catch (err) {
-            let buffer = await response.arrayBuffer()
-            wasm = await WebAssembly.instantiate(buffer, imports)
-        }
     }
 
     return make(wasm.instance.exports)
-})()
-
-exports.fetchPath = null
+}
