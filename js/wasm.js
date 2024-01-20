@@ -127,13 +127,16 @@ const make = wasm => {
 
 const imports = {}
 
-let wasm
+let loadedWasm
 module.exports.loadWasm = async function (fetchPath) {
 
     //Already loaded
-    if (wasm) {
-        return wasm
+    if (loadedWasm) {
+        return loadedWasm
     }
+
+    //Instantiate
+    let wasm
 
     //Load using fetch
     if (fetchPath) {
@@ -162,5 +165,5 @@ module.exports.loadWasm = async function (fetchPath) {
         wasm = await WebAssembly.instantiate(buffer, imports)
     }
 
-    return make(wasm.instance.exports)
+    return loadedWasm =make(wasm.instance.exports)
 }
