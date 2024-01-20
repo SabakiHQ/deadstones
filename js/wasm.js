@@ -165,5 +165,5 @@ module.exports.loadWasm = async function (fetchPath) {
         wasm = await WebAssembly.instantiate(buffer, imports)
     }
 
-    return loadedWasm =make(wasm.instance.exports)
+    return loadedWasm = make(wasm.instance.exports)
 }
