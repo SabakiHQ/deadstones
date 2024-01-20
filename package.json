@@ -3,6 +3,12 @@
   "version": "2.1.2",
   "description": "Simple Monte Carlo functions to determine dead stones on a Go board.",
   "main": "./js/main.js",
+  "exports": {
+    ".": {
+      "require": "./js/main.js",
+      "import": "./js/main.mjs"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SabakiHQ/deadstones.git"
