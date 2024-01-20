@@ -1,4 +1,4 @@
-const {loadWasm} = require('./wasm.js')
+import {loadWasm} from './wasm.mjs'
 
 const parseBoard = data => ({
     newData: [].concat(...data),
@@ -18,11 +18,11 @@ const parseGrid = (values, width) => {
 }
 
 let fetchPath = null
-const useFetch = function(path) {
+export const useFetch = function(path) {
     fetchPath = path
 }
 
-const guess = async function(data, {finished = false, iterations = 100} = {}) {
+export const guess = async function(data, {finished = false, iterations = 100} = {}) {
     const wasm = await loadWasm(fetchPath)
     const {newData, width} = parseBoard(data)
     const indices = wasm.guess(newData, width, finished, iterations, Date.now())
@@ -30,7 +30,7 @@ const guess = async function(data, {finished = false, iterations = 100} = {}) {
     return parseVertices(indices, width)
 }
 
-const playTillEnd = async function(data, sign) {
+export const playTillEnd = async function(data, sign) {
     const wasm = await loadWasm(fetchPath)
     const {newData, width} = parseBoard(data)
     const values = wasm.playTillEnd(newData, width, sign, Date.now())
@@ -38,7 +38,7 @@ const playTillEnd = async function(data, sign) {
     return parseGrid(values, width)
 }
 
-const getProbabilityMap = async function(data, iterations) {
+export const getProbabilityMap = async function(data, iterations) {
     const wasm = await loadWasm(fetchPath)
     const {newData, width} = parseBoard(data)
     const values = wasm.getProbabilityMap(newData, width, iterations, Date.now())
@@ -46,7 +46,7 @@ const getProbabilityMap = async function(data, iterations) {
     return parseGrid(values, width)
 }
 
-const getFloatingStones = async function(data) {
+export const getFloatingStones = async function(data) {
     const wasm = await loadWasm(fetchPath)
     const {newData, width} = parseBoard(data)
     const indices = wasm.getFloatingStones(newData, width)
@@ -54,7 +54,7 @@ const getFloatingStones = async function(data) {
     return parseVertices(indices, width)
 }
 
-module.exports = {
+export default {
     useFetch,
     guess,
     playTillEnd,

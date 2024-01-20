@@ -128,7 +128,7 @@ const make = wasm => {
 const imports = {}
 
 let loadedWasm
-module.exports.loadWasm = async function (fetchPath) {
+export const loadWasm = async (fetchPath) => {
 
     //Already loaded
     if (loadedWasm) {
