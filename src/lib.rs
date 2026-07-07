@@ -1,11 +1,9 @@
-extern crate wasm_bindgen;
-
 mod rand;
 mod deadstones;
 mod pseudo_board;
 
-use rand::Rand;
-use pseudo_board::{Sign, PseudoBoard};
+use crate::rand::Rand;
+use crate::pseudo_board::{Sign, PseudoBoard};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]

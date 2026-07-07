@@ -1,4 +1,4 @@
-# @sabaki/deadstones [![Build Status](https://travis-ci.org/SabakiHQ/deadstones.svg?branch=master)](https://travis-ci.org/SabakiHQ/deadstones)
+# @sabaki/deadstones [![CI](https://github.com/SabakiHQ/deadstones/actions/workflows/ci.yml/badge.svg)](https://github.com/SabakiHQ/deadstones/actions/workflows/ci.yml)
 
 Simple Monte Carlo algorithm to determine dead stones on a Go board.
 
@@ -16,7 +16,14 @@ To use this module, require it as follows:
 const deadstones = require('@sabaki/deadstones')
 ~~~
 
-This module supports fetching the WASM file via `fetch` on the web if no node environment is found. Use a bundler like webpack and call the following method right after `import` or `require`:
+ESM is also supported:
+
+~~~js
+import * as deadstones from '@sabaki/deadstones'
+// or: import {guess, useFetch} from '@sabaki/deadstones'
+~~~
+
+In the browser the WASM file is loaded via `fetch` instead of the file system. Bundle with a tool like webpack and, right after `import`/`require`, point the loader at the `.wasm` file. Loading is lazy, so this just needs to run before the first call:
 
 ~~~js
 deadstones.useFetch('./path/to/deadstones_bg.wasm')
@@ -30,7 +37,7 @@ Make sure you have the Rust toolchain installed via `rustup`. This project uses 
 $ rustup target add wasm32-unknown-unknown
 ~~~
 
-Make sure you have [`wasm-pack`](https://rustwasm.github.io/wasm-pack/), Node.js 8 or higher, and npm installed. Clone this repository and install its dependencies with npm:
+Make sure you have [`wasm-pack`](https://rustwasm.github.io/wasm-pack/), a current Node.js LTS, and npm installed. Clone this repository and install its dependencies with npm:
 
 ~~~sh
 $ git clone https://github.com/SabakiHQ/deadstones

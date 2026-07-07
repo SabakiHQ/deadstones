@@ -19,8 +19,20 @@ impl PseudoBoard {
     }
 
     pub fn get_neighbors(&self, v: Vertex) -> Vec<Vertex> {
-        let mut result = vec![v - self.width, v + self.width];
+        // Off-board neighbors are simply omitted. (The previous version pushed
+        // `v - width` unconditionally and leaned on usize underflow wrapping to a
+        // huge, out-of-bounds index that `get()` reads back as None; that only
+        // works with overflow checks off, so it panicked under `cargo test`.)
+        let mut result = vec![];
         let x = v % self.width;
+
+        if v >= self.width {
+            result.push(v - self.width);
+        }
+
+        if v + self.width < self.data.len() {
+            result.push(v + self.width);
+        }
 
         if x > 0 {
             result.push(v - 1);
@@ -113,7 +125,7 @@ impl PseudoBoard {
     pub fn make_pseudo_move(&mut self, sign: Sign, vertex: Vertex) -> Option<Vec<Vertex>> {
         let neighbors = self.get_neighbors(vertex);
         let mut check_capture = false;
-        let mut check_multi_dead_chains = false;
+        let mut lone_stone = false;
 
         if neighbors.iter().all(|&neighbor| {
             let s = self.get(neighbor);
@@ -129,14 +141,13 @@ impl PseudoBoard {
                 .all(|&n| self.get(n) != Some(sign));
 
             if is_point_chain {
-                check_multi_dead_chains = true;
+                lone_stone = true;
             } else {
                 check_capture = true;
             }
         }
 
         let mut dead = vec![];
-        let mut dead_chains = 0;
 
         for neighbor in neighbors.into_iter() {
             if self.get(neighbor) != Some(-sign) || self.has_liberties(neighbor) {
@@ -144,7 +155,6 @@ impl PseudoBoard {
             }
 
             let chain = self.get_chain(neighbor);
-            dead_chains += 1;
 
             for c in chain.into_iter() {
                 self.set(c, 0);
@@ -152,7 +162,13 @@ impl PseudoBoard {
             }
         }
 
-        if check_multi_dead_chains && dead_chains <= 1
+        // A lone stone played with no liberties is only legal if it captures. The
+        // gate here is on *stones* captured, not chains: capturing a whole enemy
+        // group (more than one stone) is a real, legal move -- this is what lets a
+        // single-eye dead group actually get taken in a playout (issue #10).
+        // Capturing exactly one stone with a lone stone is left illegal: it's the
+        // ko shape, and allowing it would let play_till_end ping-pong forever.
+        if lone_stone && dead.len() <= 1
         || check_capture && dead.len() == 0 {
             for &d in &dead {
                 self.set(d, -sign);
@@ -199,5 +215,81 @@ impl PseudoBoard {
         }
 
         result
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const B: Sign = 1;
+    const W: Sign = -1;
+
+    // A lone stone that fills the last eye of an enemy group captures the whole
+    // group -- this must be legal, or single-eye dead groups never get taken in a
+    // playout (issue #10). 5x5: a white 8-stone ring with one central eye, walled
+    // in by black, so the eye is the ring's only liberty.
+    #[test]
+    fn lone_stone_capturing_a_group_is_legal() {
+        #[rustfmt::skip]
+        let data = vec![
+            B, B, B, B, B,
+            B, W, W, W, B,
+            B, W, 0, W, B,
+            B, W, W, W, B,
+            B, B, B, B, B,
+        ];
+        let mut board = PseudoBoard {data, width: 5};
+        let eye = 2 * 5 + 2;
+
+        let captured = board.make_pseudo_move(B, eye);
+        assert!(captured.is_some(), "filling the eye should be a legal capturing move");
+        assert_eq!(captured.unwrap().len(), 8, "the whole ring should be captured");
+    }
+
+    // Capturing exactly one stone with a lone stone is the ko shape; it stays
+    // illegal so play_till_end can't ping-pong forever.
+    #[test]
+    fn lone_stone_capturing_one_stone_is_illegal() {
+        #[rustfmt::skip]
+        let data = vec![
+            0, W, 0,
+            W, 0, W,
+            B, W, B,
+        ];
+        let mut board = PseudoBoard {data, width: 3};
+        let ko_point = 1 * 3 + 1;
+
+        assert!(board.make_pseudo_move(B, ko_point).is_none());
+    }
+
+    // A lone stone with no liberties that captures nothing is suicide -> illegal.
+    #[test]
+    fn suicide_is_illegal() {
+        #[rustfmt::skip]
+        let data = vec![
+            0, W, 0,
+            W, 0, W,
+            0, W, 0,
+        ];
+        let mut board = PseudoBoard {data, width: 3};
+        let center = 1 * 3 + 1;
+
+        assert!(board.make_pseudo_move(B, center).is_none());
+    }
+
+    // Filling in your own eye (all neighbors friendly/off-board) is illegal.
+    #[test]
+    fn filling_own_eye_is_illegal() {
+        #[rustfmt::skip]
+        let data = vec![
+            0, B, 0,
+            B, 0, B,
+            0, B, 0,
+        ];
+        let mut board = PseudoBoard {data, width: 3};
+        let center = 1 * 3 + 1;
+
+        assert!(board.make_pseudo_move(B, center).is_none());
     }
 }

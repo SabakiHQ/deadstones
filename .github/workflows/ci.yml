@@ -1,0 +1,31 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # The runner ships rustup + stable Rust; rust-toolchain.toml adds the wasm
+      # target, and wasm-pack drives the build.
+      - name: Add wasm target
+        run: rustup target add wasm32-unknown-unknown
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Rust unit tests
+        run: cargo test
+
+      - run: npm ci
+      - name: Build wasm
+        run: npm run build
+      # tap's CLI doesn't run on modern Node, so `npm test` runs each suite with node.
+      - run: npm test

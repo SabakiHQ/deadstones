@@ -22,14 +22,24 @@
     "url": "https://github.com/SabakiHQ/deadstones/issues"
   },
   "homepage": "https://github.com/SabakiHQ/deadstones",
+  "exports": {
+    ".": {
+      "import": "./js/main.mjs",
+      "require": "./js/main.js"
+    },
+    "./wasm/deadstones_bg.wasm": "./wasm/deadstones_bg.wasm",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "js",
+    "wasm/deadstones_bg.wasm"
+  ],
   "scripts": {
     "build": "wasm-pack build --out-dir ./wasm --target nodejs",
-    "snip": "wasm-snip --snip-rust-fmt-code --snip-rust-panicking-code ./wasm/deadstones_bg.wasm -o ./wasm/deadstones_bg.wasm",
-    "prepublishOnly": "npm run build && npm run snip",
-    "test": "tap tests/*.test.js"
+    "prepublishOnly": "npm run build",
+    "test": "for f in tests/*.test.js; do echo \"== $f ==\"; node \"$f\" || exit 1; done"
   },
   "devDependencies": {
-    "mkdirp": "^0.5.1",
-    "tap": "^14.4.3"
+    "tap": "^14.6.1"
   }
 }

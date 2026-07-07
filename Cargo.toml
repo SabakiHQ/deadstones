@@ -1,16 +1,19 @@
 [package]
 name = "deadstones"
-version = "2.1.1"
+version = "2.1.2"
 authors = ["Yichuan Shen <shen.yichuan@gmail.com>"]
 description = "Simple Monte Carlo algorithm to determine dead stones on a Go board."
 license = "MIT"
 repository = "https://github.com/SabakiHQ/deadstones"
+edition = "2021"
 
 [lib]
-crate-type = ["cdylib"]
+# cdylib for the wasm-pack build; rlib so `cargo test` can link the crate for the
+# native unit tests in src/*.rs.
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-wasm-bindgen = "=0.2.48"
+wasm-bindgen = "0.2"
 
 [profile.release]
 lto = true

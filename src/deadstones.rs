@@ -1,5 +1,5 @@
-use rand::Rand;
-use pseudo_board::*;
+use crate::rand::Rand;
+use crate::pseudo_board::*;
 
 pub fn guess(mut board: PseudoBoard, finished: bool, iterations: usize, rand: &mut Rand) -> Vec<Vertex> {
     let floating = match finished {
@@ -114,7 +114,14 @@ pub fn play_till_end(mut board: PseudoBoard, mut sign: Sign, rand: &mut Rand) ->
         .filter(|&v| board.get(v) == Some(0))
         .collect::<Vec<_>>();
 
-    while free_vertices.len() > 0 && (!finished.0 || !finished.1) {
+    // Captures reopen vertices, so in a repeating position (e.g. a multi-stone
+    // capture cycle) the fill loop could otherwise run forever. A normal playout
+    // finishes in about `area` moves; this generous cap only trips on a genuine
+    // cycle, guaranteeing termination without full superko bookkeeping (issue #10).
+    let max_moves = board.data.len() * 10;
+    let mut move_count = 0;
+
+    while free_vertices.len() > 0 && (!finished.0 || !finished.1) && move_count < max_moves {
         let mut made_move = false;
 
         while free_vertices.len() > 0 {
@@ -133,6 +140,7 @@ pub fn play_till_end(mut board: PseudoBoard, mut sign: Sign, rand: &mut Rand) ->
                 }
 
                 made_move = true;
+                move_count += 1;
                 break;
             } else {
                 illegal_vertices.push(vertex);
@@ -173,4 +181,53 @@ pub fn play_till_end(mut board: PseudoBoard, mut sign: Sign, rand: &mut Rand) ->
     }
 
     board
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::rand::Rand;
+
+    const B: Sign = 1;
+    const W: Sign = -1;
+
+    // End-to-end (issue #10): a single-eye white group walled in by black must be
+    // reported dead. Before the capture fix, playouts could never take it, so it
+    // read as alive regardless of iterations.
+    #[test]
+    fn single_eye_group_is_detected_as_dead() {
+        #[rustfmt::skip]
+        let data = vec![
+            B, B, B, B, B,
+            B, W, W, W, B,
+            B, W, 0, W, B,
+            B, W, W, W, B,
+            B, B, B, B, B,
+        ];
+        let board = PseudoBoard {data, width: 5};
+
+        let dead = guess(board, true, 100, &mut Rand::new(42));
+        for ring_stone in [6, 7, 8, 11, 13, 16, 17, 18] {
+            assert!(
+                dead.contains(&ring_stone),
+                "ring stone {} should be dead; got {:?}", ring_stone, dead
+            );
+        }
+    }
+
+    // play_till_end must always terminate, even on a ko-ish board where captures
+    // keep reopening points. If the move cap regressed this would hang.
+    #[test]
+    fn play_till_end_terminates() {
+        #[rustfmt::skip]
+        let data = vec![
+            0, W, 0,
+            W, 0, W,
+            B, W, B,
+        ];
+        let board = PseudoBoard {data, width: 3};
+
+        let result = play_till_end(board, B, &mut Rand::new(7));
+        assert_eq!(result.data.len(), 9);
+    }
 }
