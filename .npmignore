@@ -1,6 +1,7 @@
+# The published file list is the `files` allowlist in package.json (js/ plus the
+# built wasm/deadstones_bg.wasm). This file only needs to exist so npm doesn't
+# fall back to .gitignore, which excludes the whole wasm/ dir (build output).
 .nyc_output/
 target/
 node_modules/
 *.rs
-wasm/deadstones.js
-wasm/deadstones_bg.js

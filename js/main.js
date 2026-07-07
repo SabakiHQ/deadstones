@@ -1,4 +1,4 @@
-const wasm = require('./wasm')
+const {loadWasm} = require('./wasm')
 
 const parseBoard = data => ({
     newData: [].concat(...data),
@@ -17,36 +17,50 @@ const parseGrid = (values, width) => {
     })
 }
 
-exports.useFetch = function(path) {
-    wasm.fetchPath = path
+let fetchPath = null
 
-    return exports
+const useFetch = function(path) {
+    fetchPath = path
+
+    return module.exports
 }
 
-exports.guess = async function(data, {finished = false, iterations = 100} = {}) {
+const guess = async function(data, {finished = false, iterations = 100} = {}) {
+    let wasm = await loadWasm(fetchPath)
     let {newData, width} = parseBoard(data)
-    let indices = (await wasm).guess(newData, width, finished, iterations, Date.now())
+    let indices = wasm.guess(newData, width, finished, iterations, Date.now())
 
     return parseVertices(indices, width)
-},
+}
 
-exports.playTillEnd = async function(data, sign) {
+const playTillEnd = async function(data, sign) {
+    let wasm = await loadWasm(fetchPath)
     let {newData, width} = parseBoard(data)
-    let values = (await wasm).playTillEnd(newData, width, sign, Date.now())
+    let values = wasm.playTillEnd(newData, width, sign, Date.now())
 
     return parseGrid(values, width)
-},
+}
 
-exports.getProbabilityMap = async function(data, iterations) {
+const getProbabilityMap = async function(data, iterations) {
+    let wasm = await loadWasm(fetchPath)
     let {newData, width} = parseBoard(data)
-    let values = (await wasm).getProbabilityMap(newData, width, iterations, Date.now())
+    let values = wasm.getProbabilityMap(newData, width, iterations, Date.now())
 
     return parseGrid(values, width)
-},
+}
 
-exports.getFloatingStones = async function(data) {
+const getFloatingStones = async function(data) {
+    let wasm = await loadWasm(fetchPath)
     let {newData, width} = parseBoard(data)
-    let indices = (await wasm).getFloatingStones(newData, width)
+    let indices = wasm.getFloatingStones(newData, width)
 
     return parseVertices(indices, width)
+}
+
+module.exports = {
+    useFetch,
+    guess,
+    playTillEnd,
+    getProbabilityMap,
+    getFloatingStones
 }
