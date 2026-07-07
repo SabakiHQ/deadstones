@@ -1,6 +1,6 @@
 [package]
 name = "deadstones"
-version = "2.1.2"
+version = "2.2.0"
 authors = ["Yichuan Shen <shen.yichuan@gmail.com>"]
 description = "Simple Monte Carlo algorithm to determine dead stones on a Go board."
 license = "MIT"
