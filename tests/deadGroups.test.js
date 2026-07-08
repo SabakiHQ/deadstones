@@ -43,12 +43,12 @@ const containsAll = (dead, group) =>
 
 t.test('issue #10: single-eye group is detected as dead', async t => {
   let dead = await deadstones.guess(singleEye, {finished: true, iterations: 200})
-  t.assert(containsAll(dead, ringStones), 'all eight ring stones should be dead')
+  t.ok(containsAll(dead, ringStones), 'all eight ring stones should be dead')
   t.end()
 })
 
 t.test('issue #7: dead lower-left group is detected', async t => {
   let dead = await deadstones.guess(reported7, {finished: true, iterations: 200})
-  t.assert(containsAll(dead, lowerLeftGroup), 'all eight lower-left stones should be dead')
+  t.ok(containsAll(dead, lowerLeftGroup), 'all eight lower-left stones should be dead')
   t.end()
 })

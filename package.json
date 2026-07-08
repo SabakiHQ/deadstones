@@ -37,9 +37,10 @@
   "scripts": {
     "build": "wasm-pack build --out-dir ./wasm --target nodejs",
     "prepublishOnly": "npm run build",
-    "test": "for f in tests/*.test.js; do echo \"== $f ==\"; node \"$f\" || exit 1; done"
+    "pretest": "npm run build",
+    "test": "tap --allow-incomplete-coverage tests/*.test.js"
   },
   "devDependencies": {
-    "tap": "^14.6.1"
+    "tap": "^21.7.4"
   }
 }
