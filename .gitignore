@@ -1,4 +1,5 @@
 .nyc_output/
+.tap/
 target/
 node_modules/
 wasm/
